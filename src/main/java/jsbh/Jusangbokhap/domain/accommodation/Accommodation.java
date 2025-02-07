@@ -15,7 +15,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import jsbh.Jusangbokhap.domain.BaseEntity;
+import jsbh.Jusangbokhap.domain.availableDate.AvailableDate;
 import jsbh.Jusangbokhap.domain.reservation.Reservation;
 import jsbh.Jusangbokhap.domain.user.User;
 import lombok.AccessLevel;
@@ -61,9 +64,13 @@ public class Accommodation extends BaseEntity {
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
+    @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AvailableDate> availableDate = new ArrayList<>();
+
     @Builder
     public Accommodation(String address, int price, AccommodationType accommodationType,
-                         String description, Personnel maxGuests, String imageUrl, User host) {
+                         String description, Personnel maxGuests, String imageUrl, User host,
+                         List<AvailableDate> availableDate) {
         this.address = address;
         this.price = price;
         this.accommodationType = accommodationType;
@@ -72,6 +79,26 @@ public class Accommodation extends BaseEntity {
         this.imageUrl = imageUrl;
         this.host = host;
         this.reservations = new ArrayList<>();
+        this.availableDate = new ArrayList<>();
+    }
+
+    public void addAvailableDate(AvailableDate availableDates) {
+        validateDuplicateDate(availableDates);
+        availableDates.setAccommodation(this);
+        this.availableDate.add(availableDates);
+    }
+
+    private void validateDuplicateDate(AvailableDate newDate) {
+        for (AvailableDate existingDate : availableDate) {
+            if (isOverlapping(existingDate, newDate)) {
+                throw new IllegalArgumentException("이미 예약된 날짜 범위가 존재합니다: " + existingDate.getStartDate() + " ~ " + existingDate.getEndDate());
+            }
+        }
+    }
+    private boolean isOverlapping(AvailableDate existingDate, AvailableDate newDate) {
+        return (newDate.getStartDate().isBefore(existingDate.getEndDate()) && newDate.getEndDate().isAfter(existingDate.getStartDate())) ||
+                (newDate.getStartDate().equals(existingDate.getStartDate()) || newDate.getEndDate().equals(existingDate.getEndDate())) ||
+                (newDate.getStartDate().isBefore(existingDate.getStartDate()) && newDate.getEndDate().isAfter(existingDate.getEndDate()));
     }
 
 }

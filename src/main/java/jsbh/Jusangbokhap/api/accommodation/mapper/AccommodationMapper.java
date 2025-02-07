@@ -13,10 +13,8 @@ public class AccommodationMapper {
                 .accommodationType(AccommodationType.valueOf(dto.accommodationType()))
                 .description(dto.description())
                 .maxGuests(new Personnel(dto.personnel()))
-                //TODO 사진 저장 기능 추가 후 수정
-                .imageUrl(null)
-                //TODO User Service 개발 완료 시 사용자를 찾아오는 방식으로 수정
-                .host(null)
+                .imageUrl(null) // TODO: 이미지 저장 기능 추가 후 수정
+                .host(null) // TODO: User Service 개발 후 수정
                 .build();
     }
 }
