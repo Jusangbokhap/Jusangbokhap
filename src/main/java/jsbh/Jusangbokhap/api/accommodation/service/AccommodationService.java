@@ -6,6 +6,8 @@ import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
 import jsbh.Jusangbokhap.api.accommodation.mapper.AccommodationMapper;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.accommodation.repository.AccommodationRepository;
+import jsbh.Jusangbokhap.domain.availableDate.AvailableDate;
+import jsbh.Jusangbokhap.domain.availableDate.AvailableDateStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +20,11 @@ public class AccommodationService {
 
     public AccommodationResponse createAccommodation(AccommodationRequest.Register request) {
         Accommodation accommodation = AccommodationMapper.toEntity(request);
+
+        request.availableDates().forEach(date -> accommodation.addAvailableDate(
+                new AvailableDate(date.startDate(), date.endDate(), AvailableDateStatus.AVAILABLE)));
+
         accommodationRepository.save(accommodation);
-        //TODO User Service 개발 완료 시 사용자를 찾아오는 방식으로 수정
         return new AccommodationResponse.Register(accommodation.getAccommodationId(), 1L);
     }
 }
