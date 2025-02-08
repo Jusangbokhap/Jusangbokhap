@@ -1,11 +1,10 @@
 package jsbh.Jusangbokhap.api.accommodation.dto;
 
 import java.util.List;
-import java.util.Set;
 import jsbh.Jusangbokhap.api.availableDate.dto.AvailableDateRequest;
 
 public interface AccommodationRequest {
-    record Register(
+    record Create(
             String address,
             String description,
             Integer price,
@@ -13,6 +12,15 @@ public interface AccommodationRequest {
             Integer personnel,
             Integer userId,
             List<AvailableDateRequest> availableDates
+    ) implements AccommodationRequest{
+    }
+
+    record Update(
+            String address,
+            String description,
+            Integer price,
+            String accommodationType,
+            Integer personnel
     ) implements AccommodationRequest{
     }
 }
