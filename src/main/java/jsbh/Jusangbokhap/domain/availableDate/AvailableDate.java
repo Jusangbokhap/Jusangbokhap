@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import jsbh.Jusangbokhap.api.availableDate.exception.AvailableDateCustomException;
+import jsbh.Jusangbokhap.api.availableDate.exception.AvailableDateErrorCode;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,31 +40,49 @@ public class AvailableDate {
     @Enumerated(EnumType.STRING)
     private AvailableDateStatus status;
 
-    public void setAccommodation(Accommodation accommodation) {
+    protected void setAccommodation(Accommodation accommodation) {
         this.accommodation = accommodation;
     }
 
     @Builder
     public AvailableDate(LocalDate startDate, LocalDate endDate, AvailableDateStatus status) {
-        validateDate(startDate, endDate);
+        validateDateRange(startDate, endDate);
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
     }
 
-    private void validateDate(LocalDate startDate, LocalDate endDate) {
+    public void updateDate(LocalDate startDate, LocalDate endDate, AvailableDateStatus status) {
+        validateDateRange(startDate, endDate);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+    }
+
+    private void validateDateRange(LocalDate startDate, LocalDate endDate) {
 
         if (startDate == null || endDate == null) {
-            throw new IllegalArgumentException("날짜 값은 필수입니다.");
+            throw new AvailableDateCustomException(AvailableDateErrorCode.MISSING_DATE);
         }
 
         if (startDate.isEqual(endDate)) {
-            throw new IllegalArgumentException("시작일과 종료일은 같을 수 없습니다.");
+            throw new AvailableDateCustomException(AvailableDateErrorCode.SAME_START_END);
 
         }
 
         if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("시작 날짜는 종료 날짜보다 이후일 수 없습니다.");
+            throw new AvailableDateCustomException(AvailableDateErrorCode.START_AFTER_END);
         }
+    }
+
+    public boolean isOverlappingWith(AvailableDate newDate) {
+        return (newDate.getStartDate().isBefore(this.getEndDate()) &&
+                newDate.getEndDate().isAfter(this.getStartDate())) ||
+
+                (newDate.getStartDate().equals(this.getStartDate()) ||
+                        newDate.getEndDate().equals(this.getEndDate())) ||
+
+                (newDate.getStartDate().isBefore(this.getStartDate()) &&
+                        newDate.getEndDate().isAfter(this.getEndDate()));
     }
 }

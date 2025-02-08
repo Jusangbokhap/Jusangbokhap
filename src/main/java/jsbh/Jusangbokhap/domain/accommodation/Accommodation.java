@@ -15,21 +15,27 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import jsbh.Jusangbokhap.domain.BaseEntity;
 import jsbh.Jusangbokhap.domain.availableDate.AvailableDate;
+import jsbh.Jusangbokhap.domain.availableDate.AvailableDates;
 import jsbh.Jusangbokhap.domain.reservation.Reservation;
 import jsbh.Jusangbokhap.domain.user.User;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Accommodation extends BaseEntity {
+
+
+    public static final Integer MIN_PERSON = 0;
+    public static final Integer MAX_PERSON = 0;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +45,8 @@ public class Accommodation extends BaseEntity {
     private String address;
 
     @Column(nullable = false)
-    private Integer price;
+    @Embedded
+    private AccommodationPrice accommodationPrice;
 
     @Enumerated(EnumType.STRING)
     private AccommodationType accommodationType;
@@ -48,7 +55,7 @@ public class Accommodation extends BaseEntity {
     private String description;
 
     @Embedded
-    private Personnel maxGuests;
+    private AccommodationCapacity maxGuests;
 
     @Column
     private String imageUrl;
@@ -62,40 +69,41 @@ public class Accommodation extends BaseEntity {
     private List<Reservation> reservations = new ArrayList<>();
 
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AvailableDate> availableDate = new ArrayList<>();
+    private List<AvailableDate> availableDates = new ArrayList<>();
 
-    @Builder
-    public Accommodation(String address, int price, AccommodationType accommodationType,
-                         String description, Personnel maxGuests, String imageUrl, User host,
-                         List<AvailableDate> availableDate) {
-        this.address = address;
-        this.price = price;
-        this.accommodationType = accommodationType;
-        this.description = description;
-        this.maxGuests = maxGuests;
-        this.imageUrl = imageUrl;
-        this.host = host;
-        this.reservations = new ArrayList<>();
-        this.availableDate = new ArrayList<>();
-    }
+    public void updateDetails(String address,
+                              String description,
+                              Integer price,
+                              String accommodationType,
+                              Integer personnel) {
 
-    public void addAvailableDate(AvailableDate availableDates) {
-        validateDuplicateDate(availableDates);
-        availableDates.setAccommodation(this);
-        this.availableDate.add(availableDates);
-    }
-
-    private void validateDuplicateDate(AvailableDate newDate) {
-        for (AvailableDate existingDate : availableDate) {
-            if (isOverlapping(existingDate, newDate)) {
-                throw new IllegalArgumentException("이미 예약된 날짜 범위가 존재합니다: " + existingDate.getStartDate() + " ~ " + existingDate.getEndDate());
-            }
+        if (address != null && !address.isEmpty()) {
+            this.address = address;
+        }
+        if (description != null && !description.isEmpty()) {
+            this.description = description;
+        }
+        if (price != null) {
+            this.accommodationPrice = new AccommodationPrice(price);
+        }
+        if (accommodationType != null) {
+            this.accommodationType = AccommodationType.valueOf(accommodationType);
+        }
+        if (personnel != null && personnel > MIN_PERSON) {
+            this.maxGuests = new AccommodationCapacity(personnel);
         }
     }
-    private boolean isOverlapping(AvailableDate existingDate, AvailableDate newDate) {
-        return (newDate.getStartDate().isBefore(existingDate.getEndDate()) && newDate.getEndDate().isAfter(existingDate.getStartDate())) ||
-                (newDate.getStartDate().equals(existingDate.getStartDate()) || newDate.getEndDate().equals(existingDate.getEndDate())) ||
-                (newDate.getStartDate().isBefore(existingDate.getStartDate()) && newDate.getEndDate().isAfter(existingDate.getEndDate()));
+
+    public AvailableDates getAvailableDates() {
+        return new AvailableDates(this.availableDates);
+    }
+
+    public void addAvailableDate(AvailableDate newAvailableDate) {
+        getAvailableDates().add(newAvailableDate, this);
+    }
+
+    public void updateAvailableDate(AvailableDate updatedDate) {
+        getAvailableDates().update(updatedDate);
     }
 
 }
