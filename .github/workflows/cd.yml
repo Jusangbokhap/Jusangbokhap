@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - KR-109-chore/setup-ci
 
 jobs:
   deploy-dev:
