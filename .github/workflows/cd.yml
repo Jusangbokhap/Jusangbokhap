@@ -25,7 +25,8 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t jusangbokhap:${{ github.sha }} . docker tag jusangbokhap:${{ github.sha }} jusangbokhap:latest
+          docker build -t jusangbokhap:${{ github.sha }} .
+          docker tag jusangbokhap:${{ github.sha }} jusangbokhap:latest
 
       - name: Deploy to Dev Server
         uses: appleboy/ssh-action@master
