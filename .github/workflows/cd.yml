@@ -43,7 +43,7 @@ jobs:
 
       - name: Build and push Docker image
         env:
-          DOCKERHUB_USERNAME: jinho7329@gmail.com
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_NAME: jusangbokhap
           IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
         run: |
