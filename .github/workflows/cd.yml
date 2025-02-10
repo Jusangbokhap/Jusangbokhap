@@ -65,5 +65,6 @@ jobs:
             cd /home/ec2-user/jusangbokhap
             docker-compose pull
             docker-compose down
+            docker rm -f jusangbokhap-app || true
             docker-compose up -d
             docker image prune -f
