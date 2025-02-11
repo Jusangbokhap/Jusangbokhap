@@ -10,11 +10,13 @@ public interface AccommodationResponse {
     }
 
     record Read(
+            String businessName,
+            String title,
             String address,
             String description,
             Integer price,
             String accommodationType,
-            Integer personnel,
+            Integer guests,
             Long userId,
             List<AvailableDateResponse> availableDates
     ) implements AccommodationResponse {
@@ -27,6 +29,16 @@ public interface AccommodationResponse {
 
     record Delete(
             Long accommodationId
+    ) implements AccommodationResponse {
+    }
+
+    record Search(
+            Long accommodationId,
+            String businessName,
+            String title,
+            String address,
+            Integer AccommodationPrice,
+            Long totalPrice
     ) implements AccommodationResponse {
     }
 }

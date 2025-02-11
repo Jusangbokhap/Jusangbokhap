@@ -19,13 +19,19 @@ public class AvailableDates {
         this.availableDates = new ArrayList<>();
     }
 
+    public Long calculateTotalPrice(int price) {
+        return availableDates
+                .get(0)
+                .getDateDifference() * price;
+    }
+
     public List<AvailableDate> getDates() {
         return Collections.unmodifiableList(availableDates);
     }
 
     public void add(AvailableDate newDate, Accommodation accommodation) {
-        validateDateOverlap(newDate);
         newDate.setAccommodation(accommodation);
+        validateDateOverlap(newDate);
         availableDates.add(newDate);
     }
 
@@ -44,6 +50,11 @@ public class AvailableDates {
 
     public void validateDateOverlap(AvailableDate newDate) {
         for (AvailableDate existingDate : availableDates) {
+
+            if (existingDate.getId() == null) {
+                continue;
+            }
+
             if (existingDate.getId().equals(newDate.getId())) {
                 continue;
             }
