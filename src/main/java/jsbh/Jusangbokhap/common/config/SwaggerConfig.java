@@ -17,15 +17,4 @@ public class SwaggerConfig {
                         .version("v1")
                         .description("숙소 예약 시스템의 결제 API 문서"));
     }
-
-    @Bean
-    public OperationCustomizer customizeOperation() {
-        return (operation, handlerMethod) -> {
-            Class<?> declaringClass = handlerMethod.getMethod().getDeclaringClass();
-            if (declaringClass.getPackageName().startsWith("jsbh.Jusangbokhap.domain")) {
-                operation.setDeprecated(true);
-            }
-            return operation;
-        };
-    }
 }
