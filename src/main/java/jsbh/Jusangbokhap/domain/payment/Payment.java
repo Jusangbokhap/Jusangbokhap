@@ -8,6 +8,7 @@ import jsbh.Jusangbokhap.domain.reservation.Reservation;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -27,10 +28,11 @@ public class Payment {
 
     private Integer price;
     private String paymentMethod;
-    private String paymentStatus;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus paymentStatus;
 
-    public void setPaymentStatus(String status) {
-        this.paymentStatus = status;
-    }
+    @Column(nullable = false, unique = true)
+    private String tid;
 }
