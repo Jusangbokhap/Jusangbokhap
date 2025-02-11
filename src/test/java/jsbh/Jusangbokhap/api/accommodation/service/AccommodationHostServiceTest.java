@@ -1,21 +1,31 @@
 package jsbh.Jusangbokhap.api.accommodation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest.Create;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
 import jsbh.Jusangbokhap.api.accommodation.exception.AccommodationCustomException;
 import jsbh.Jusangbokhap.api.availableDate.dto.AvailableDateRequest;
 import jsbh.Jusangbokhap.api.availableDate.exception.AvailableDateCustomException;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
+import jsbh.Jusangbokhap.domain.accommodation.AccommodationAddress;
+import jsbh.Jusangbokhap.domain.accommodation.AccommodationCapacity;
+import jsbh.Jusangbokhap.domain.accommodation.AccommodationPrice;
+import jsbh.Jusangbokhap.domain.accommodation.AccommodationType;
 import jsbh.Jusangbokhap.domain.accommodation.repository.AccommodationRepository;
+import jsbh.Jusangbokhap.domain.availableDate.AvailableDate;
 import jsbh.Jusangbokhap.domain.availableDate.AvailableDateStatus;
+import jsbh.Jusangbokhap.domain.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -261,6 +271,65 @@ class AccommodationHostServiceTest {
                 availableDateRequests);
 
         assertThrows(AvailableDateCustomException.class, () -> accommodationHostService.create(request));
+    }
+
+    @Test
+    @DisplayName("숙소 조회 성공: 호스트가 등록된 숙소가 존재")
+    void 호스트_숙소_조회_성공() {
+        Long userId = 1L;
+        User host = new User(null, null, null);
+        ReflectionTestUtils.setField(host, "userId", 1L);
+
+        Accommodation accommodation = Accommodation.builder()
+                .businessName("Henann Garden Resort")
+                .accommodationPrice(AccommodationPrice.from(1000))
+                .availableDates(List.of(new AvailableDate(
+                        LocalDate.parse("2025-02-02"),
+                        LocalDate.parse("2025-02-10"),
+                        AvailableDateStatus.AVAILABLE)))
+                .maxGuests(AccommodationCapacity.from(10))
+                .accommodationType(AccommodationType.CAMPING)
+                .host(host)
+                .address(new AccommodationAddress(
+                        1L,
+                        "서울특별시",
+                        "강남구",
+                        "역삼동",
+                        "144-17 201호",
+                        18.1234,
+                        19.1323
+                ))
+                .build();
+
+        List<Accommodation> accommodations = List.of(accommodation);
+
+        when(accommodationRepository.findByHostId(anyLong()))
+                .thenAnswer(invocation -> accommodations.stream()
+                        .filter(ac -> ac.getHost().getUserId().equals(invocation.getArgument(0)))
+                        .collect(Collectors.toList()));
+
+
+        List<AccommodationResponse> result = accommodationHostService.findByHostId(userId);
+
+        assertThat(result).isNotEmpty();
+        assertThat(result.size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("숙소 조회 실패: 호스트가 등록된 숙소가 존재하지 않음")
+    void 호스트_숙소_조회_실패_호스트가_등록한_숙소가_없음() {
+        Long userId = 1L;
+        User host = new User(null, null, null);
+        ReflectionTestUtils.setField(host, "userId", 1L);
+
+        List<Accommodation> emptyAccommodations = Collections.emptyList();
+
+        when(accommodationRepository.findByHostId(anyLong()))
+                .thenReturn(emptyAccommodations);
+
+        List<AccommodationResponse> result = accommodationHostService.findByHostId(userId);
+
+        assertThat(result).isEmpty();
     }
 
     private Create createAccommodationRequest(

@@ -2,6 +2,7 @@ package jsbh.Jusangbokhap.api.accommodation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import java.util.List;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest.Create;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
@@ -39,7 +40,7 @@ public class AccommodationHostController {
     }
 
     @Operation(
-            summary = "숙소 조회 API",
+            summary = "숙소 조회(숙소 ID) API",
             description ="숙소 번호로 숙소를 조회한다.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "숙소 조회 성공"),
@@ -47,8 +48,22 @@ public class AccommodationHostController {
             }
     )
     @GetMapping("/{accommodationId}")
-    public ResponseEntity<AccommodationResponse> getAccommodation(@PathVariable Long accommodationId) {
-        return ResponseEntity.ok(accommodationHostService.find(accommodationId));
+    public ResponseEntity<AccommodationResponse> getAccommodationById(@PathVariable Long accommodationId) {
+        return ResponseEntity.ok(accommodationHostService.findByAccommodationId(accommodationId));
+    }
+
+
+    @Operation(
+            summary = "숙소 조회(호스트 ID) API",
+            description ="호스트 번호로 호스트가 등록한 숙소를 조회한다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "숙소 조회 성공"),
+                    @ApiResponse(responseCode = "400", description = "숙소 조회 실패")
+            }
+    )
+    @GetMapping("/users/{hostId}")
+    public ResponseEntity<List<AccommodationResponse>> getAccommodationsByHostId(@PathVariable Long hostId) {
+        return ResponseEntity.ok(accommodationHostService.findByHostId(hostId));
     }
 
     @Operation(
