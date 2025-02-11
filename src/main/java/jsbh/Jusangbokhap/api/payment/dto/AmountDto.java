@@ -1,6 +1,7 @@
 package jsbh.Jusangbokhap.api.payment.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 @Getter
@@ -8,7 +9,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class AmountDto {
+
     @Schema(description = "총 결제 금액")
+    @Positive(message = "총 결제 금액은 0보다 커야 합니다.")
     private int total;
 
     @Schema(description = "비과세 금액")
