@@ -24,7 +24,8 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://localhost:27017/chatdb
+      uri: mongodb://root:root@localhost:27017/chatdb?authSource=admin
+      auto-index-creation: true
 
   redis:
     host: localhost

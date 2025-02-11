@@ -16,8 +16,8 @@ class ChatRoomRepositoryTest {
 	@Test
 	public void testChatRoomCreation() {
 		ChatRoom room = ChatRoom.builder()
-			.userId1(1L)
-			.userId2(2L)
+			.participant1Id(1L)
+			.participant2Id(2L)
 			.build();
 
 		chatRoomRepository.save(room);

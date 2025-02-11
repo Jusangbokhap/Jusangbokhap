@@ -8,7 +8,10 @@ import java.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jsbh.Jusangbokhap.chat.chatmessage.ChatMessage;
+import jsbh.Jusangbokhap.chat.chatmessage.ChatMessageRepository;
+import jsbh.Jusangbokhap.chat.chatmessage.ChatMessageRequest;
 import jsbh.Jusangbokhap.chat.chatroom.ChatRoom;
+import jsbh.Jusangbokhap.chat.chatroom.ChatRoomRepository;
 import jsbh.Jusangbokhap.chat.chatroom.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +21,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
-	private static final Map<String, WebSocketSession> sessions = new HashMap<>();
-
+	private final ChatMessageRepository chatMessageRepository;
 	private final ChatRoomService chatRoomService;
+
+	// 세션에 있는 모든 사용자 저장>??
+	private static final Map<Long, WebSocketSession> sessions = new HashMap<>();
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
-		String userId = getUserIdFromSession(session);
+		Long userId = getUserIdFromSession(session);
 		if (userId != null) {
 			sessions.put(userId, session);
 			log.info("User Connected: {}", userId);
@@ -33,48 +38,55 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-		String payload = message.getPayload();
-		ChatMessage chatMessage = new ObjectMapper().readValue(payload, ChatMessage.class);
-		log.info("\uD83D\uDCE9 Received from {} to {}: {}", chatMessage.getSender(), chatMessage.getReceiver(),
+		ObjectMapper objectMapper = new ObjectMapper();
+		ChatMessageRequest dto = objectMapper.readValue(message.getPayload(), ChatMessageRequest.class);
+
+		Long roomId = chatRoomService.getOrCreateChatRoom(dto.getSenderId(), dto.getReceiverId()).getId();
+
+		ChatMessage chatMessage = ChatMessage.toEntity(roomId, dto);
+		// mongoDB에 메시지 저장
+		chatMessageRepository.save(chatMessage);
+
+		log.info("Received from {} to {}: {}", chatMessage.getSenderId(), chatMessage.getReceiverId(),
 			chatMessage.getMessage());
 
-		Long senderId = Long.valueOf(chatMessage.getSender());
-		Long receiverId = Long.valueOf(chatMessage.getReceiver());
-
-		ChatRoom chatRoom = chatRoomService.getOrCreateChatRoom(senderId, receiverId);
-
 		// 상대방에게 메시지 전송
-		sendMessageToUser(chatMessage.getReceiver(), payload);
+		sendMessageToUser(chatMessage.getReceiverId(), chatMessage.getMessage());
 	}
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-		String userId = getUserIdFromSession(session);
+		Long userId = getUserIdFromSession(session);
 		sessions.remove(userId);
 	}
 
-	// 세션에서 사용자 ID 가져오기
-	private String getUserIdFromSession(WebSocketSession session) {
-		String query = Objects.requireNonNull(session.getUri()).getQuery();
-		if (query != null && query.contains("userId=")) {
-			return query.split("=")[1];
-		}
-		return null;
-	}
-
 	// 특정 사용자에게 메시지 보내기
-	private void sendMessageToUser(String userId, String message) throws Exception {
-		WebSocketSession userSession = sessions.get(userId);
+	private void sendMessageToUser(Long receiverId, String message) throws Exception {
+		WebSocketSession userSession = sessions.get(receiverId);
 		if (userSession != null && userSession.isOpen()) {
 			userSession.sendMessage(new TextMessage(message));
 		}
 	}
 
-	private String extractReceiverId(String payload) {
-		return payload.split(":")[0];
+	// 세션에서 사용자 ID 가져오기
+	private Long getUserIdFromSession(WebSocketSession session) {
+		// String userId = (String)session.getAttributes().get("userId");
+
+		String query = session.getUri().getQuery();
+		Map<String, String> params = parseQueryParams(query);
+		return params.containsKey("userId") ? Long.parseLong(params.get("userId")) : null;
 	}
 
-	private String extractMessageContent(String payload) {
-		return payload.split(":")[1];
+	private Map<String, String> parseQueryParams(String query) {
+		Map<String, String> map = new HashMap<>();
+		if (query != null) {
+			for (String param : query.split("&")) {
+				String[] pair = param.split("=");
+				if (pair.length == 2) {
+					map.put(pair[0], pair[1]);
+				}
+			}
+		}
+		return map;
 	}
 }

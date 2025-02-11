@@ -1,23 +1,26 @@
 package jsbh.Jusangbokhap.chat.chatroom;
 
 import jakarta.persistence.*;
+import jsbh.Jusangbokhap.domain.BaseEntity;
 import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "chatroom", uniqueConstraints = @UniqueConstraint(columnNames = {"userId1", "userId2"}))
-public class ChatRoom {
+@Table(name = "chatroom", uniqueConstraints = @UniqueConstraint(columnNames = {"participant1Id", "participant2Id"}))
+public class ChatRoom extends BaseEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Long userId1;
-	private Long userId2;
+	private Long participant1Id;
+
+	private Long participant2Id;
 
 	@Builder
-	private ChatRoom(Long userId1, Long userId2) {
-		this.userId1 = userId1;
-		this.userId2 = userId2;
+	public ChatRoom(Long participant1Id, Long participant2Id) {
+		this.participant1Id = participant1Id;
+		this.participant2Id = participant2Id;
 	}
 }

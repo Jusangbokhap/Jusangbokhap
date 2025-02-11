@@ -14,9 +14,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
 	private final ChatWebSocketHandler chatWebSocketHandler;
 
+	// ws://localhost:8080/chat
+	private static final String WEBSOCKETPATH = "/chat";
+
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(chatWebSocketHandler, "/chat") // WebSocket 엔드포인트
+		registry.addHandler(chatWebSocketHandler, WEBSOCKETPATH)
 			.setAllowedOrigins("*"); // CORS 문제 해결 (실제 배포 시 특정 도메인 설정 필요)
 	}
 }
