@@ -178,12 +178,13 @@ public class KakaoPayService {
      */
     @Transactional
     public void cancelPayment(String orderId) {
-        Payment payment = paymentRepository.findByOrderId(orderId)
+        Payment payment = paymentRepository.findByReservation_ReservationId(Long.valueOf(orderId))
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PAYMENT));
 
         payment.setPaymentStatus(PaymentStatus.FAILED.name());
         paymentRepository.save(payment);
 
-        logger.info("❌ [결제 취소 처리 완료] 주문번호: {}", orderId);
+        logger.info("❌ [결제 취소 완료] 주문번호: {}", orderId);
     }
+
 }
