@@ -31,6 +31,9 @@ public class Accommodation extends BaseEntity {
     private Long accommodationId;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private String address;
 
     @Column(nullable = false)
