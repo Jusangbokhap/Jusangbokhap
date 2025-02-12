@@ -5,6 +5,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jsbh.Jusangbokhap.api.payment.dto.*;
 import jsbh.Jusangbokhap.api.payment.service.KakaoPayService;
+import jsbh.Jusangbokhap.common.exception.CustomException;
+import jsbh.Jusangbokhap.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +37,11 @@ public class PaymentController {
     @Operation(summary = "결제 취소 API", description = "tid(결제 고유번호)로 결제를 취소합니다.")
     @PostMapping("/cancel")
     @Transactional
-    public ResponseEntity<CancelPaymentResponseDto> cancelPayment(@RequestParam @NotBlank(message = "tid 값은 필수입니다.") String tid) {
+    public ResponseEntity<CancelPaymentResponseDto> cancelPayment(
+            @RequestParam(value = "tid", required = false) String tid) {
+        if (tid == null || tid.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_REQUEST, "tid 값은 필수입니다.");
+        }
         CancelPaymentResponseDto response = kakaoPayService.cancelPayment(tid);
         return ResponseEntity.ok(response);
     }
