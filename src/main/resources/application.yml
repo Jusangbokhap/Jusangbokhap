@@ -18,6 +18,21 @@ spring:
     redis:
       host: localhost
       port: 6379
+  config:
+    import: optional:file:.env[.properties]
+
+elasticsearch:
+  custom:
+    host: ${ELASTICSEARCH_HOST}
+    port: ${ELASTICSEARCH_PORT}
+    username: ${ELASTICSEARCH_USERNAME}
+    password: ${ELASTICSEARCH_PASSWORD}
+    fingerprint: ${ELASTICSEARCH_FINGERPRINT}
+    search:
+      index-name:
+        search-keyword
+      top-index-name:
+        top-keywords
 
 search:
   key:
