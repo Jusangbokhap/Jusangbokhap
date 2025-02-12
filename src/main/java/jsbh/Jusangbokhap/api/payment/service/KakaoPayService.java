@@ -10,8 +10,7 @@ import jsbh.Jusangbokhap.domain.reservation.Reservation;
 import jsbh.Jusangbokhap.domain.reservation.ReservationRepository;
 import jsbh.Jusangbokhap.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
@@ -25,11 +24,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KakaoPayService {
 
-    private static final Logger logger = LoggerFactory.getLogger(KakaoPayService.class);
     private final RestTemplate restTemplate;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
@@ -57,20 +56,15 @@ public class KakaoPayService {
 
     private String getTid(String orderId) {
         String tid = redisTemplate.opsForValue().get(orderId);
-
         if (tid == null) {
-            logger.error("❌ Redis에서 tid 조회 실패: orderId={}, Redis 데이터 없음", orderId);
-
+            log.error("❌ Redis에서 tid 조회 실패: orderId={}", orderId);
             Optional<Payment> existingPayment = paymentRepository.findByReservation_ReservationId(Long.valueOf(orderId));
             if (existingPayment.isPresent()) {
-                logger.warn("⚠️ 결제가 이미 DB에 존재함: orderId={}, tid={}", orderId, existingPayment.get().getTid());
                 throw new CustomException(ErrorCode.PAYMENT_ALREADY_PROCESSED);
             }
-
-            throw new CustomException(ErrorCode.REDIS_FETCH_FAILED, "tid 조회 실패: orderId=" + orderId);
+            throw new CustomException(ErrorCode.REDIS_FETCH_FAILED);
         }
-
-        logger.info("✅ Redis에서 tid 조회 성공: orderId={}, tid={}", orderId, tid);
+        log.info("✅ Redis에서 tid 조회 성공: orderId={}, tid={}", orderId, tid);
         return tid;
     }
 
@@ -78,10 +72,28 @@ public class KakaoPayService {
      * 1️⃣ 결제 준비 요청
      */
     public PayReadyResponseDto requestPayment(PayRequestDto requestDto) {
-        String url = "https://kapi.kakao.com/v1/payment/ready";
-        logger.info("📢 [결제 요청] 숙소ID={}, 사용자ID={}, 결제금액={}",
-                requestDto.getOrderId(), requestDto.getUserId(), requestDto.getTotalAmount());
+        log.info("📢 [결제 요청] 숙소ID={}, 사용자ID={}, 결제금액={}", requestDto.getOrderId(), requestDto.getUserId(), requestDto.getTotalAmount());
+        HttpEntity<Map<String, String>> request = createPaymentRequestEntity(requestDto);
 
+        try {
+            ResponseEntity<PayReadyResponseDto> response = restTemplate.exchange(
+                    "https://kapi.kakao.com/v1/payment/ready", HttpMethod.POST, request, PayReadyResponseDto.class);
+
+            if (response.getBody() == null || response.getBody().getTid() == null) {
+                throw new CustomException(ErrorCode.KAKAO_PAY_INVALID_RESPONSE);
+            }
+
+            saveTid(requestDto.getOrderId(), response.getBody().getTid());
+            return response.getBody();
+
+        } catch (RestClientException e) {
+            log.error("❌ 카카오페이 결제 요청 실패: {}", e.getMessage());
+            redisTemplate.delete(requestDto.getOrderId());
+            throw new CustomException(ErrorCode.PAYMENT_REQUEST_FAILED);
+        }
+    }
+
+    private HttpEntity<Map<String, String>> createPaymentRequestEntity(PayRequestDto requestDto) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + adminKey);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -98,28 +110,11 @@ public class KakaoPayService {
         requestBody.put("cancel_url", cancelUrl);
         requestBody.put("fail_url", failUrl);
 
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
-
-        try {
-            ResponseEntity<PayReadyResponseDto> response = restTemplate.exchange(
-                    url, HttpMethod.POST, request, PayReadyResponseDto.class);
-
-            if (response.getBody() == null || response.getBody().getTid() == null) {
-                throw new CustomException(ErrorCode.KAKAO_PAY_INVALID_RESPONSE);
-            }
-
-            saveTid(requestDto.getOrderId(), response.getBody().getTid());
-            return response.getBody();
-
-        } catch (RestClientException e) {
-            logger.error("❌ 카카오페이 결제 요청 실패: {}", e.getMessage());
-            redisTemplate.delete(requestDto.getOrderId());
-            throw new CustomException(ErrorCode.PAYMENT_REQUEST_FAILED);
-        }
+        return new HttpEntity<>(requestBody, headers);
     }
 
     /**
-     * 2️⃣ 결제 승인 요청 (PENDING → API 호출 → COMPLETED)
+     * 2️⃣ 결제 승인 요청
      */
     @Transactional
     public PayApproveResponseDto approvePayment(PayApproveRequestDto requestDto) {
@@ -128,12 +123,6 @@ public class KakaoPayService {
         }
 
         String tid = getTid(requestDto.getOrderId());
-
-        Optional<Payment> existingPayment = paymentRepository.findByReservation_ReservationId(Long.valueOf(requestDto.getOrderId()));
-        if (existingPayment.isPresent() && existingPayment.get().getPaymentStatus().equals(PaymentStatus.COMPLETED)) {
-            throw new CustomException(ErrorCode.PAYMENT_ALREADY_PROCESSED);
-        }
-
         Reservation reservation = reservationRepository.findById(Long.valueOf(requestDto.getOrderId()))
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RESERVATION));
 
@@ -148,59 +137,48 @@ public class KakaoPayService {
 
         try {
             PayApproveResponseDto responseDto = callKakaoPayApproveApi(requestDto, tid);
-
             reservation.confirmReservation();
-
-            payment.setPaymentStatus(PaymentStatus.COMPLETED);
-            payment.setPrice(responseDto.getAmount().getTotal());
-            payment.setPaymentMethod(responseDto.getPayment_method_type());
-
-            paymentRepository.save(payment);
-            reservationRepository.save(reservation);
-
+            payment.updatePaymentOnSuccess(responseDto);
             return responseDto;
         } catch (RestClientException e) {
-            payment.setPaymentStatus(PaymentStatus.FAILED);
-            paymentRepository.save(payment);
+            payment.updatePaymentOnFailure();
             throw new CustomException(ErrorCode.PAYMENT_REQUEST_FAILED);
         }
     }
 
     /**
-     * 2️⃣ 결제 취소
+     * 3️⃣ 결제 취소
      */
     @Transactional
     public CancelPaymentResponseDto cancelPayment(String tid) {
         Payment payment = paymentRepository.findByTid(tid)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PAYMENT));
+        payment.validateBeforeCancel();
 
-        if (payment.getPaymentStatus().equals(PaymentStatus.CANCELED)) {
-            throw new CustomException(ErrorCode.PAYMENT_ALREADY_CANCELED);
+        HttpEntity<Map<String, String>> request = createCancelRequestEntity(payment);
+        ResponseEntity<CancelPaymentResponseDto> response = restTemplate.exchange(
+                "https://kapi.kakao.com/v1/payment/cancel", HttpMethod.POST, request, CancelPaymentResponseDto.class);
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new CustomException(ErrorCode.KAKAO_PAY_API_ERROR);
         }
 
-        String url = "https://kapi.kakao.com/v1/payment/cancel";
+        payment.cancel();
+        return response.getBody();
+    }
 
+    private HttpEntity<Map<String, String>> createCancelRequestEntity(Payment payment) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + adminKey);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("cid", cid);
-        requestBody.put("tid", tid);
+        requestBody.put("tid", payment.getTid());
         requestBody.put("cancel_amount", String.valueOf(payment.getPrice()));
         requestBody.put("cancel_tax_free_amount", "0");
 
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<CancelPaymentResponseDto> response = restTemplate.exchange(url, HttpMethod.POST, request, CancelPaymentResponseDto.class);
-
-        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new CustomException(ErrorCode.KAKAO_PAY_API_ERROR);
-        }
-
-        payment.setPaymentStatus(PaymentStatus.CANCELED);
-        paymentRepository.save(payment);
-
-        return response.getBody();
+        return new HttpEntity<>(requestBody, headers);
     }
 
     private PayApproveResponseDto callKakaoPayApproveApi(PayApproveRequestDto requestDto, String tid) {
