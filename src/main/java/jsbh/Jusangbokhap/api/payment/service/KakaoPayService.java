@@ -60,7 +60,8 @@ public class KakaoPayService {
             log.error("❌ Redis에서 tid 조회 실패: orderId={}", orderId);
             Optional<Payment> existingPayment = paymentRepository.findByReservation_ReservationId(Long.valueOf(orderId));
             if (existingPayment.isPresent()) {
-                throw new CustomException(ErrorCode.PAYMENT_ALREADY_PROCESSED);
+                log.warn("⚠️ 이미 결제된 주문입니다. DB에서 tid 조회를 시도합니다.");
+                return existingPayment.get().getTid();
             }
             throw new CustomException(ErrorCode.REDIS_FETCH_FAILED);
         }
@@ -153,8 +154,8 @@ public class KakaoPayService {
     public CancelPaymentResponseDto cancelPayment(String tid) {
         Payment payment = paymentRepository.findByTid(tid)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PAYMENT));
-        payment.validateBeforeCancel();
 
+        payment.validateBeforeCancel();
         HttpEntity<Map<String, String>> request = createCancelRequestEntity(payment);
         ResponseEntity<CancelPaymentResponseDto> response = restTemplate.exchange(
                 "https://kapi.kakao.com/v1/payment/cancel", HttpMethod.POST, request, CancelPaymentResponseDto.class);
@@ -162,6 +163,9 @@ public class KakaoPayService {
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             throw new CustomException(ErrorCode.KAKAO_PAY_API_ERROR);
         }
+
+        Reservation reservation = payment.getReservation();
+        reservation.cancelReservation("결제 취소로 인한 예약 취소");
 
         payment.cancel();
         return response.getBody();
