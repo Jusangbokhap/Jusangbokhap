@@ -23,7 +23,8 @@ public enum ErrorCode {
     PAYMENT_ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "이미 결제가 완료된 주문입니다."),
     NOT_FOUND_PAYMENT(HttpStatus.NOT_FOUND, "해당 예약의 결제 내역이 없습니다."),
     KAKAO_PAY_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "카카오페이 API 호출 중 오류가 발생했습니다."),
-    PAYMENT_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 결제입니다.");
+    PAYMENT_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 결제입니다."),
+    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다.");
 
     private final HttpStatus status;
     private final String message;
