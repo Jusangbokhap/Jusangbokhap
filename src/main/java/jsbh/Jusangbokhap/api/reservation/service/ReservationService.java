@@ -31,12 +31,10 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RESERVATION));
 
-        Optional<Payment> optionalPayment = paymentRepository.findByReservation_ReservationId(reservationId);
-        optionalPayment.ifPresent(payment -> {
-            if (payment.getPaymentStatus().equals(PaymentStatus.COMPLETED.name())) {
-                kakaoPayService.cancelPayment(payment.getTid());
-            }
-        });
+        Payment payment = paymentRepository.findByReservation_ReservationId(reservationId).orElse(null);
+        if (payment != null && payment.getPaymentStatus() == PaymentStatus.COMPLETED) {
+            kakaoPayService.cancelPayment(payment.getTid());
+        }
 
         reservation.cancelReservation(cancelReason);
 
