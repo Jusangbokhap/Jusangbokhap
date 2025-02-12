@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     boolean existsByTid(String tid);
 
-    Optional<Payment> findByTid(String tid);  // ✅ findByTid() 추가
+    Optional<Payment> findByTid(String tid);
     Optional<Payment> findByReservation_ReservationId(Long reservationId);
 }
