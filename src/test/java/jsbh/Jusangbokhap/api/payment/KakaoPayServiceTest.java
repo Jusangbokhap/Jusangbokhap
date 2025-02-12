@@ -7,8 +7,11 @@ import jsbh.Jusangbokhap.common.exception.ErrorCode;
 import jsbh.Jusangbokhap.domain.payment.Payment;
 import jsbh.Jusangbokhap.domain.payment.PaymentRepository;
 import jsbh.Jusangbokhap.domain.payment.PaymentStatus;
+import jsbh.Jusangbokhap.domain.reservation.Reservation;
 import jsbh.Jusangbokhap.domain.reservation.ReservationRepository;
+import jsbh.Jusangbokhap.domain.user.User;
 import jsbh.Jusangbokhap.domain.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -30,18 +34,26 @@ class KakaoPayServiceTest {
 
     @Mock private RestTemplate restTemplate;
     @Mock private RedisTemplate<String, String> redisTemplate;
+    @Mock private ValueOperations<String, String> valueOperations;
     @Mock private PaymentRepository paymentRepository;
     @Mock private UserRepository userRepository;
     @Mock private ReservationRepository reservationRepository;
 
     @InjectMocks private KakaoPayService kakaoPayService;
 
+    @BeforeEach
+    void setUp() {
+
+    }
+
     /**
      * 📌 1️⃣ 결제 요청 테스트 (성공)
      */
     @Test
     void requestPayment_Success() {
-        // Given
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        doNothing().when(valueOperations).set(anyString(), anyString(), any());
+
         PayRequestDto requestDto = PayRequestDto.builder()
                 .orderId("12345")
                 .userId("user1")
@@ -74,7 +86,7 @@ class KakaoPayServiceTest {
     void approvePayment_Success() {
         PayApproveRequestDto requestDto = PayApproveRequestDto.builder()
                 .orderId("12345")
-                .userId("user1")
+                .userId("9999")
                 .pgToken("valid_pg_token")
                 .tid("TID123456")
                 .build();
@@ -86,7 +98,15 @@ class KakaoPayServiceTest {
                 .approved_at(LocalDateTime.now())
                 .build();
 
+        User mockUser = mock(User.class);
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(mockUser));
+
+        Reservation mockReservation = mock(Reservation.class);
+        when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(mockReservation));
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(redisTemplate.opsForValue().get(requestDto.getOrderId())).thenReturn("TID123456");
+
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(PayApproveResponseDto.class)))
                 .thenReturn(new ResponseEntity<>(fakeResponse, HttpStatus.OK));
 
@@ -123,8 +143,12 @@ class KakaoPayServiceTest {
     @Test
     void cancelPayment_Success() {
         String tid = "TID123456";
+
+        Reservation mockReservation = mock(Reservation.class);
+
         Payment payment = Payment.builder()
                 .tid(tid)
+                .reservation(mockReservation)
                 .price(50000)
                 .paymentStatus(PaymentStatus.COMPLETED)
                 .build();
