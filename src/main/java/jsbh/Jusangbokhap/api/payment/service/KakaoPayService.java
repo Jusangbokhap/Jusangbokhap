@@ -86,11 +86,11 @@ public class KakaoPayService {
 
             saveTid(requestDto.getOrderId(), response.getBody().getTid());
             return response.getBody();
-
         } catch (RestClientException e) {
             log.error("❌ 카카오페이 결제 요청 실패: {}", e.getMessage());
-            redisTemplate.delete(requestDto.getOrderId());
             throw new CustomException(ErrorCode.PAYMENT_REQUEST_FAILED);
+        } finally {
+            redisTemplate.delete(requestDto.getOrderId());
         }
     }
 
@@ -160,7 +160,7 @@ public class KakaoPayService {
         ResponseEntity<CancelPaymentResponseDto> response = restTemplate.exchange(
                 "https://kapi.kakao.com/v1/payment/cancel", HttpMethod.POST, request, CancelPaymentResponseDto.class);
 
-        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null || response.getBody().getTid() == null) {
             throw new CustomException(ErrorCode.KAKAO_PAY_API_ERROR);
         }
 
