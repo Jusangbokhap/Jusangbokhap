@@ -95,6 +95,7 @@ jobs:
           helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
             --namespace monitoring \
             --set grafana.adminPassword=${{ secrets.GRAFANA_ADMIN_PASSWORD }} \
+            --set grafana.service.type=LoadBalancer \
             --set grafana.persistence.enabled=true \
             --set grafana.persistence.storageClassName=gp2 \
             --set grafana.persistence.size=10Gi \
