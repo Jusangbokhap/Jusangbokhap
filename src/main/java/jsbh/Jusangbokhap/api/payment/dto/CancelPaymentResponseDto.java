@@ -31,9 +31,9 @@ public class CancelPaymentResponseDto {
     @Positive(message = "취소된 결제 금액은 0보다 커야 합니다.")
     private String cancelAmount;
 
-    @Schema(description = "결제 승인 시간 (ISO 8601 형식)", example = "2024-02-10T15:30:45")
+    @Schema(description = "결제 승인 시간", example = "2024-02-10T15:30:45")
     private String approvedAt;
 
-    @Schema(description = "결제 취소 시간 (ISO 8601 형식)", example = "2024-02-11T10:15:30")
+    @Schema(description = "결제 취소 시간", example = "2024-02-11T10:15:30")
     private String canceledAt;
 }
