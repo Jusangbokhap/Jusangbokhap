@@ -1,28 +1,30 @@
 package jsbh.Jusangbokhap.api.payment.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class AmountDto {
 
     @Schema(description = "총 결제 금액")
+    @JsonProperty("total_amount")
     @Positive(message = "총 결제 금액은 0보다 커야 합니다.")
-    private int total;
+    private int totalAmount;
 
     @Schema(description = "비과세 금액")
-    private int tax_free;
+    @JsonProperty("tax_free_amount")
+    private int taxFreeAmount;
 
     @Schema(description = "부가세")
-    private int vat;
-
-    @Schema(description = "포인트 결제 금액")
-    private int point;
+    @JsonProperty("vat_amount")
+    private int vatAmount;
 
     @Schema(description = "할인 금액")
-    private int discount;
+    @JsonProperty("discount_amount")
+    private int discountAmount;
 }
