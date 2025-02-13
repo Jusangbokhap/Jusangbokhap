@@ -92,7 +92,16 @@ jobs:
           kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo update
-          helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \ --namespace monitoring \ --set grafana.adminPassword=${{ secrets.GRAFANA_ADMIN_PASSWORD }} \ --set grafana.persistence.enabled=true \ --set grafana.persistence.storageClassName=gp2 \ --set grafana.persistence.size=10Gi \ --set prometheus.prometheusSpec.retention=15d \ --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=gp2 \ --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=10Gi
+          helm upgrade --install prometheus
+           prometheus-community/kube-prometheus-stack \
+            --namespace monitoring \
+            --set grafana.adminPassword=${{ secrets.GRAFANA_ADMIN_PASSWORD }} \
+            --set grafana.persistence.enabled=true \
+            --set grafana.persistence.storageClassName=gp2 \
+            --set grafana.persistence.size=10Gi \
+            --set prometheus.prometheusSpec.retention=15d \
+            --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=gp2 \
+            --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=10Gi
 
       - name: Deploy ServiceMonitor
         run: |
