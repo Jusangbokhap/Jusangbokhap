@@ -41,8 +41,6 @@ public class ReservationService {
         return convertToDto(reservation);
     }
 
-
-
     @Transactional(readOnly = true)
     public List<ReservationResponseDto> getCanceledReservations(Long userId) {
         List<Reservation> canceledReservations = reservationRepository.findByGuest_UserIdAndReservationStatus(userId, ReservationStatus.CANCELED);
