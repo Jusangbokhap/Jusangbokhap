@@ -5,6 +5,8 @@ on:
     branches: [ "dev" ]
   push:
     branches: [ "feat/**", "feature/**", "fix/**", "KR-123-chore/kr-123"]
+    paths-ignore:
+      - '.github/workflows/**'
 
 permissions:
   contents: read
