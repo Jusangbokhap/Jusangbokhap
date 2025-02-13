@@ -16,7 +16,7 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    @Operation(summary = "숙소 예약 취소 API", description = "사용자가 숙소 예약을 취소하면 결제까지 자동으로 취소됩니다.")
+    @Operation(summary = "숙소 예약 취소 API", description = "사용자가 예약 취소를 요청하면 예약한 숙소 취소 및 결제한 금액이 환불됩니다.")
     @PostMapping("/cancel")
     public ResponseEntity<ReservationResponseDto> cancelReservation(
             @RequestParam Long reservationId,
