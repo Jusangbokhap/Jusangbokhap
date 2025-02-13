@@ -1,6 +1,7 @@
 package jsbh.Jusangbokhap.domain.payment;
 
 import jakarta.persistence.*;
+import jsbh.Jusangbokhap.api.receipt.dto.KakaoPayOrderResponseDto;
 import jsbh.Jusangbokhap.api.payment.dto.PayApproveResponseDto;
 import jsbh.Jusangbokhap.common.exception.CustomException;
 import jsbh.Jusangbokhap.common.exception.ErrorCode;
@@ -28,7 +29,7 @@ public class Payment {
     private Reservation reservation;
 
     @Column(nullable = false)
-    private Integer price;
+    private Long price;
 
     @Column(nullable = false)
     private String paymentMethod;
@@ -40,10 +41,24 @@ public class Payment {
     @Column(nullable = false, unique = true)
     private String tid;
 
+    public void updatePaymentOnSuccessFromOrder(KakaoPayOrderResponseDto responseDto) {
+        this.paymentStatus = PaymentStatus.COMPLETED;
+        long totalAmount = responseDto.getAmount().getTotalAmount();
+        if (totalAmount > Long.MAX_VALUE) {
+            throw new CustomException(ErrorCode.INVALID_AMOUNT);
+        }
+        this.price = totalAmount;
+        this.paymentMethod = responseDto.getPaymentMethod();
+    }
+
     public void updatePaymentOnSuccess(PayApproveResponseDto responseDto) {
         this.paymentStatus = PaymentStatus.COMPLETED;
-        this.price = responseDto.getAmount().getTotal();
-        this.paymentMethod = responseDto.getPayment_method_type();
+        long totalAmount = responseDto.getAmount().getTotalAmount();
+        if (totalAmount > Long.MAX_VALUE) {
+            throw new CustomException(ErrorCode.INVALID_AMOUNT);
+        }
+        this.price = totalAmount;
+        this.paymentMethod = responseDto.getPaymentMethod();
     }
 
     public void updatePaymentOnFailure() {
