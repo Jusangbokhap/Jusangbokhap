@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jusangbokhap-app
+  labels:
+    app: jusangbokhap-app
 spec:
   replicas: 2
   strategy:
@@ -16,18 +18,25 @@ spec:
     metadata:
       labels:
         app: jusangbokhap-app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
     spec:
       containers:
         - name: jusangbokhap-app
           image: 850995539111.dkr.ecr.ap-northeast-2.amazonaws.com/jusangbokhap
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
           envFrom:
             - secretRef:
                 name: jusangbokhap-secret
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "prod"
+            - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+              value: "health,prometheus,metrics"
           resources:
             requests:
               memory: "512Mi"
@@ -38,14 +47,14 @@ spec:
           livenessProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: http
             initialDelaySeconds: 180
             periodSeconds: 15
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              port: 8080
+              port: http
               path: /actuator/health
             initialDelaySeconds: 60
             periodSeconds: 15
@@ -54,7 +63,7 @@ spec:
           startupProbe:
             httpGet:
               path: /actuator/health
-              port: 8080
+              port: http
             initialDelaySeconds: 60
             periodSeconds: 15
             failureThreshold: 30

@@ -4,6 +4,22 @@ spring:
   profiles:
     active: prod
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,metrics,info
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
 ---
 spring:
   config:
@@ -17,6 +33,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+management:
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
 
 ---
 spring:
@@ -49,8 +72,16 @@ spring:
       idle-timeout: 300000
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+    prometheus:
+      enabled: true
+
 
 server:
   port: 8080
