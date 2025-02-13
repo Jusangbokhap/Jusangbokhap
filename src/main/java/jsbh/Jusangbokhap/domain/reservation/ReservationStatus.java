@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum ReservationStatus {
-    PENDING("확인중"),
-    CONFIRMED("확정됨"),
-    CANCELED("취소됨");
+    PENDING("예약 확인중"),
+    CONFIRMED("예약 확정됨"),
+    CANCELED("예약 취소됨");
 
     private final String description;
 
