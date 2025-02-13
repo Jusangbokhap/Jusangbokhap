@@ -17,6 +17,12 @@ spec:
           image: 850995539111.dkr.ecr.ap-northeast-2.amazonaws.com/jusangbokhap
           ports:
             - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: jusangbokhap-secret
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
           resources:
             requests:
               memory: "512Mi"
@@ -30,9 +36,20 @@ spec:
               port: 8080
             initialDelaySeconds: 60
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               port: 8080
               path: /actuator/health
             initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
