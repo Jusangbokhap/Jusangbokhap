@@ -35,6 +35,35 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		if (userId != null && roomId != null) {
 			sessions.put(userId, session);
 			log.info("User {} enter room {}", userId, roomId);
+			markMessagesAsRead(roomId, userId);
+		}
+	}
+
+	private void markMessagesAsRead(Long roomId, Long userId) {
+		ChatMessage lastMessage = chatMessageRepository.findTopByRoomIdOrderByTimestampDesc(roomId);
+
+		// 마지막 메시지를 현재 입장한 사용자가 보냈다면 읽음상태 업데이트 하지 않음
+		if (lastMessage != null && lastMessage.getSenderId().equals(userId)) {
+			log.info("User {} is the last sender. No need to update read status.", userId);
+			return;
+		}
+
+		// 마지막 메시지를 현재 입장한 사용자가 받은거라면 읽지 않은 메시지 전부 읽음으로 업데이트
+		ChatMessage firstUnreadMessage = chatMessageRepository.findFirstByRoomIdAndReadFalseOrderByTimestampAsc(
+			roomId);
+		if (firstUnreadMessage == null) {
+			log.info("No unread messages found for user {} in room {}", userId, roomId);
+			return; // 모든 메시지가 이미 읽힘
+		}
+
+		List<ChatMessage> unreadMessages = chatMessageRepository.findByRoomIdAndMessageIdGreaterThanEqualAndReadFalse(
+			roomId, firstUnreadMessage.getId());
+
+		if (!unreadMessages.isEmpty()) {
+			unreadMessages.forEach(message -> message.updateReadStatus(true));
+			chatMessageRepository.saveAll(unreadMessages);
+
+			log.info("Updated {} unread messages as read for user {} in room {}", unreadMessages.size(), userId, roomId);
 		}
 	}
 
