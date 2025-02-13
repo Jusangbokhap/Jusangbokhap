@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
+import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse.Read;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.accommodation.AccommodationAddress;
 import jsbh.Jusangbokhap.domain.accommodation.AccommodationCapacity;
@@ -317,6 +318,10 @@ class AccommodationGuestServiceTest {
                         .toList());
 
         List<AccommodationResponse> responses = accommodationGuestService.find(filter);
+
+        for (AccommodationResponse respons : responses) {
+            Read respons1 = (Read) respons;
+        }
 
         assertEquals(0, responses.size(), "검색 결과 숙소 개수가 0이어야 한다");
         verify(accommodationRepository, times(1))

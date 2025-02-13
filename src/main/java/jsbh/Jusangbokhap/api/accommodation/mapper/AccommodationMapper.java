@@ -54,6 +54,8 @@ public class AccommodationMapper {
                 accommodation.getBusinessName(),
                 accommodation.getTitle(),
                 accommodation.getAddress().getFullAddress(),
+                accommodation.getAddress().getLongitude(),
+                accommodation.getAddress().getLatitude(),
                 accommodation.getDescription(),
                 accommodation.getAccommodationPrice().getPrice(),
                 accommodation.getAccommodationType().name(),

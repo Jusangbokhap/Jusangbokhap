@@ -9,15 +9,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
+import jsbh.Jusangbokhap.domain.BaseEntity;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Facility {
+@Builder
+@AllArgsConstructor
+public class Facility extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,4 +37,10 @@ public class Facility {
     private FacilityCategory category;
 
     private Integer facilityCount;
+
+    public void updateFacility(Integer facilityCount) {
+        this.facilityCount = facilityCount;
+        this.setUpdatedAt(LocalDateTime.now());
+    }
+
 }
