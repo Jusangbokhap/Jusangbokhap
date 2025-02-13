@@ -59,4 +59,8 @@ public class PayApproveResponseDto {
 
     @Schema(description = "결제 상태 상세 정보")
     private List<PaymentActionDetailDto> payment_action_details;
+
+    public String getPaymentMethod() {
+        return this.payment_method_type;
+    }
 }
