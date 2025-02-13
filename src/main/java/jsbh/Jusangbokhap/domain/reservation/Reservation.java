@@ -8,13 +8,13 @@ import jsbh.Jusangbokhap.common.exception.ErrorCode;
 import jsbh.Jusangbokhap.domain.BaseEntity;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.user.User;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Reservation extends BaseEntity {
 
     @Id
@@ -54,5 +54,9 @@ public class Reservation extends BaseEntity {
         }
         this.reservationStatus = ReservationStatus.CANCELED;
         this.cancelReason = reason;
+    }
+
+    public void updateReservationStatus(ReservationStatus status) {
+        this.reservationStatus = status;
     }
 }
