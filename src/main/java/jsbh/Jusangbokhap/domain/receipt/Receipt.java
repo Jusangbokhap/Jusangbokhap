@@ -1,26 +1,19 @@
 package jsbh.Jusangbokhap.domain.receipt;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import java.time.LocalDateTime;
-import jsbh.Jusangbokhap.domain.BaseEntity;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.reservation.Reservation;
 import jsbh.Jusangbokhap.domain.user.User;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Receipt extends BaseEntity {
+@AllArgsConstructor
+@Builder
+public class Receipt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,6 +35,8 @@ public class Receipt extends BaseEntity {
     private Long fee;
     private Long profit;
     private LocalDateTime givenAt;
-    private String receiptStatus;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReceiptStatus receiptStatus;
 }
