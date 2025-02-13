@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest.Create;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
-import jsbh.Jusangbokhap.api.accommodation.service.AccommodationService;
+import jsbh.Jusangbokhap.api.accommodation.service.AccommodationHostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/accommodations")
 @RequiredArgsConstructor
-public class AccommodationController {
+public class AccommodationHostController {
 
-    private final AccommodationService accommodationService;
+    private final AccommodationHostService accommodationHostService;
 
     @Operation(
             summary = "숙소 등록 API",
@@ -34,9 +34,8 @@ public class AccommodationController {
             }
     )
     @PostMapping
-    public ResponseEntity<AccommodationResponse> createAccommodation(
-            @RequestBody Create request) {
-        return new ResponseEntity<>(accommodationService.create(request), HttpStatus.CREATED);
+    public ResponseEntity<AccommodationResponse> createAccommodation(@RequestBody Create request) {
+        return new ResponseEntity<>(accommodationHostService.create(request), HttpStatus.CREATED);
     }
 
     @Operation(
@@ -49,7 +48,7 @@ public class AccommodationController {
     )
     @GetMapping("/{accommodationId}")
     public ResponseEntity<AccommodationResponse> getAccommodation(@PathVariable Long accommodationId) {
-        return ResponseEntity.ok(accommodationService.find(accommodationId));
+        return ResponseEntity.ok(accommodationHostService.find(accommodationId));
     }
 
     @Operation(
@@ -63,7 +62,7 @@ public class AccommodationController {
     @PutMapping("/{accommodationId}")
     public ResponseEntity<AccommodationResponse> updateAccommodation(@PathVariable Long accommodationId,
                                                                      @RequestBody AccommodationRequest.Update request) {
-        return ResponseEntity.ok(accommodationService.update(accommodationId, request));
+        return ResponseEntity.ok(accommodationHostService.update(accommodationId, request));
     }
 
 
@@ -77,6 +76,7 @@ public class AccommodationController {
     )
     @DeleteMapping("/{accommodationId}")
     public ResponseEntity<AccommodationResponse> deleteAccommodation(@PathVariable Long accommodationId) {
-        return ResponseEntity.ok(accommodationService.delete(accommodationId));
+        return ResponseEntity.ok(accommodationHostService.delete(accommodationId));
     }
+
 }

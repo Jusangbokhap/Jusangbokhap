@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import jsbh.Jusangbokhap.api.availableDate.exception.AvailableDateCustomException;
 import jsbh.Jusangbokhap.api.availableDate.exception.AvailableDateErrorCode;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
@@ -32,10 +33,10 @@ public class AvailableDate {
     private Accommodation accommodation;
 
     @Column(nullable = false)
-    private LocalDate startDate;
+    private LocalDate checkin;
 
     @Column(nullable = false)
-    private LocalDate endDate;
+    private LocalDate checkout;
 
     @Enumerated(EnumType.STRING)
     private AvailableDateStatus status;
@@ -45,17 +46,21 @@ public class AvailableDate {
     }
 
     @Builder
-    public AvailableDate(LocalDate startDate, LocalDate endDate, AvailableDateStatus status) {
-        validateDateRange(startDate, endDate);
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public AvailableDate(LocalDate checkin, LocalDate checkout, AvailableDateStatus status) {
+        validateDateRange(checkin, checkout);
+        this.checkin = checkin;
+        this.checkout = checkout;
         this.status = status;
+    }
+
+    public Long getDateDifference() {
+        return ChronoUnit.DAYS.between(this.checkin, this.checkout);
     }
 
     public void updateDate(LocalDate startDate, LocalDate endDate, AvailableDateStatus status) {
         validateDateRange(startDate, endDate);
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.checkin = startDate;
+        this.checkout = endDate;
         this.status = status;
     }
 
@@ -76,13 +81,13 @@ public class AvailableDate {
     }
 
     public boolean isOverlappingWith(AvailableDate newDate) {
-        return (newDate.getStartDate().isBefore(this.getEndDate()) &&
-                newDate.getEndDate().isAfter(this.getStartDate())) ||
+        return (newDate.getCheckin().isBefore(this.getCheckout()) &&
+                newDate.getCheckout().isAfter(this.getCheckin())) ||
 
-                (newDate.getStartDate().equals(this.getStartDate()) ||
-                        newDate.getEndDate().equals(this.getEndDate())) ||
+                (newDate.getCheckin().equals(this.getCheckin()) ||
+                        newDate.getCheckout().equals(this.getCheckout())) ||
 
-                (newDate.getStartDate().isBefore(this.getStartDate()) &&
-                        newDate.getEndDate().isAfter(this.getEndDate()));
+                (newDate.getCheckin().isBefore(this.getCheckin()) &&
+                        newDate.getCheckout().isAfter(this.getCheckout()));
     }
 }
