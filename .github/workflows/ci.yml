@@ -37,7 +37,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build, test and analyze
-        run: ./gradlew build test jacocoTestReport sonarqube --info
+        run: ./gradlew build test jacocoTestReport --info
 
       - name: Upload test results
         if: always()
