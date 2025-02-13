@@ -1,26 +1,19 @@
 package jsbh.Jusangbokhap.domain.payment;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.JoinColumn;
-
-import jsbh.Jusangbokhap.domain.BaseEntity;
+import jakarta.persistence.*;
+import jsbh.Jusangbokhap.api.payment.dto.PayApproveResponseDto;
+import jsbh.Jusangbokhap.common.exception.CustomException;
+import jsbh.Jusangbokhap.common.exception.ErrorCode;
 import jsbh.Jusangbokhap.domain.reservation.Reservation;
 import jsbh.Jusangbokhap.domain.user.User;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Payment extends BaseEntity {
+@AllArgsConstructor
+@Builder
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +23,40 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
+    @Column(nullable = false)
     private Integer price;
 
+    @Column(nullable = false)
     private String paymentMethod;
 
-    private String paymentStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus paymentStatus;
+
+    @Column(nullable = false, unique = true)
+    private String tid;
+
+    public void updatePaymentOnSuccess(PayApproveResponseDto responseDto) {
+        this.paymentStatus = PaymentStatus.COMPLETED;
+        this.price = responseDto.getAmount().getTotal();
+        this.paymentMethod = responseDto.getPayment_method_type();
+    }
+
+    public void updatePaymentOnFailure() {
+        this.paymentStatus = PaymentStatus.FAILED;
+    }
+
+    public void validateBeforeCancel() {
+        if (this.paymentStatus == PaymentStatus.CANCELED) {
+            throw new CustomException(ErrorCode.PAYMENT_ALREADY_CANCELED);
+        }
+    }
+
+    public void cancel() {
+        this.paymentStatus = PaymentStatus.CANCELED;
+    }
 }

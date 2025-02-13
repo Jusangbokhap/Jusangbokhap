@@ -1,25 +1,12 @@
 package jsbh.Jusangbokhap.domain.reservation;
 
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+
+import jsbh.Jusangbokhap.common.exception.CustomException;
+import jsbh.Jusangbokhap.common.exception.ErrorCode;
 import jsbh.Jusangbokhap.domain.BaseEntity;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
-import jsbh.Jusangbokhap.domain.receipt.Receipt;
 import jsbh.Jusangbokhap.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,9 +29,6 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "accommodation_id", nullable = false)
     private Accommodation accommodation;
 
-    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Receipt> receipts = new ArrayList<>();
-
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
@@ -56,4 +40,19 @@ public class Reservation extends BaseEntity {
 
     @Column(nullable = false)
     private Integer guestCount;
+
+    @Column(nullable = true, length = 255)
+    private String cancelReason;
+
+    public void confirmReservation() {
+        this.reservationStatus = ReservationStatus.CONFIRMED;
+    }
+
+    public void cancelReservation(String reason) {
+        if (this.reservationStatus == ReservationStatus.CANCELED) {
+            throw new CustomException(ErrorCode.RESERVATION_ALREADY_CANCELED);
+        }
+        this.reservationStatus = ReservationStatus.CANCELED;
+        this.cancelReason = reason;
+    }
 }
