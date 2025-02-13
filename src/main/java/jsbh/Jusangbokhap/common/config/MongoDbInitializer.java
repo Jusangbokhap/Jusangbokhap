@@ -1,4 +1,4 @@
-package jsbh.Jusangbokhap.chat.chatmessage;
+package jsbh.Jusangbokhap.common.config;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;

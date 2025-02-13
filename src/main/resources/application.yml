@@ -70,7 +70,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://${MONGODB_HOST}:27017/${MONGODB_NAME}
+      uri: mongodb://${MONGODB_HOST}:27017/${MONGODB_NAME}?authSource=admin
       username: ${MONGODB_USERNAME}
       password: ${MONGODB_PASSWORD}
 

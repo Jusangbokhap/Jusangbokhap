@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jsbh.Jusangbokhap.chat.chatmessage.ChatMessage;
 import jsbh.Jusangbokhap.chat.chatmessage.ChatMessageRepository;
 import jsbh.Jusangbokhap.chat.chatmessage.ChatMessageRequest;
-import jsbh.Jusangbokhap.chat.chatroom.ChatRoom;
 import jsbh.Jusangbokhap.chat.chatroom.ChatRoomRepository;
 import jsbh.Jusangbokhap.chat.chatroom.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +21,20 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatWebSocketHandler extends TextWebSocketHandler {
 
 	private final ChatMessageRepository chatMessageRepository;
+	private final ChatRoomRepository chatRoomRepository;
 	private final ChatRoomService chatRoomService;
 
-	// 세션에 있는 모든 사용자 저장>??
+	// 세션에 있는 모든 사용자 저장
 	private static final Map<Long, WebSocketSession> sessions = new HashMap<>();
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
 		Long userId = getUserIdFromSession(session);
-		if (userId != null) {
+		Long roomId = getRoomIdFromSession(session);
+
+		if (userId != null && roomId != null) {
 			sessions.put(userId, session);
-			log.info("User Connected: {}", userId);
+			log.info("User {} enter room {}", userId, roomId);
 		}
 	}
 
@@ -41,17 +43,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		ObjectMapper objectMapper = new ObjectMapper();
 		ChatMessageRequest dto = objectMapper.readValue(message.getPayload(), ChatMessageRequest.class);
 
-		Long roomId = chatRoomService.getOrCreateChatRoom(dto.getSenderId(), dto.getReceiverId()).getId();
-
-		ChatMessage chatMessage = ChatMessage.toEntity(roomId, dto);
-		// mongoDB에 메시지 저장
-		chatMessageRepository.save(chatMessage);
+		ChatMessage chatMessage = ChatMessage.toEntity(dto);
 
 		log.info("Received from {} to {}: {}", chatMessage.getSenderId(), chatMessage.getReceiverId(),
 			chatMessage.getMessage());
 
+		// mongoDB에 메시지 저장
+		chatMessageRepository.save(chatMessage);
+
 		// 상대방에게 메시지 전송
-		sendMessageToUser(chatMessage.getReceiverId(), chatMessage.getMessage());
+		sendMessageToUser(chatMessage);
 	}
 
 	@Override
@@ -61,14 +62,26 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 	}
 
 	// 특정 사용자에게 메시지 보내기
-	private void sendMessageToUser(Long receiverId, String message) throws Exception {
-		WebSocketSession userSession = sessions.get(receiverId);
-		if (userSession != null && userSession.isOpen()) {
-			userSession.sendMessage(new TextMessage(message));
+
+	private void sendMessageToUser(ChatMessage chatMessage) throws Exception {
+		WebSocketSession receiverSession = sessions.get(chatMessage.getReceiverId());
+		if (receiverSession != null && receiverSession.isOpen()) {
+			chatMessage.updateReadStatus(true);
+			chatMessageRepository.save(chatMessage);
+
+			ObjectMapper objectMapper = new ObjectMapper();
+			String messageJson = objectMapper.writeValueAsString(chatMessage);
+			receiverSession.sendMessage(new TextMessage(messageJson));
 		}
 	}
 
-	// 세션에서 사용자 ID 가져오기
+	private Long getRoomIdFromSession(WebSocketSession session) {
+		String query = session.getUri().getQuery();
+		Map<String, String> params = parseQueryParams(query);
+		return params.containsKey("roomId") ? Long.parseLong(params.get("roomId")) : null;
+	}
+
+	// 사용자 ID 가져오기
 	private Long getUserIdFromSession(WebSocketSession session) {
 		// String userId = (String)session.getAttributes().get("userId");
 

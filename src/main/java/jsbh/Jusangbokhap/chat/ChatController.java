@@ -1,5 +1,7 @@
 package jsbh.Jusangbokhap.chat;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -18,18 +20,18 @@ public class ChatController {
 	private final ChatMessageService chatMessageService;
 
 	@PostMapping("/start")
-	public void startChat(@RequestParam Long hostId, @RequestParam Long guestId) {
+	public ResponseEntity<ChatRoom> startChat(@RequestParam Long hostId, @RequestParam Long guestId) {
 		// TODO: request 사용자 Id JWT or session 기반으로 변경
-		chatRoomService.getOrCreateChatRoom(guestId, hostId);
+		return ResponseEntity.ok(chatRoomService.getOrCreateChatRoom(guestId, hostId));
 	}
 
 	@GetMapping("/rooms/{userId}")
-	public List<ChatRoom> getUserChatRooms(@PathVariable Long userId) {
-		return chatRoomService.findChatRooms(userId);
+	public ResponseEntity<List<ChatRoom>> getUserChatRooms(@PathVariable Long userId) {
+		return ResponseEntity.ok(chatRoomService.findChatRooms(userId));
 	}
 
 	@GetMapping("/{roomId}")
-	public List<ChatMessage> getMessages(@PathVariable Long roomId) {
-		return chatMessageService.getMessages(roomId);
+	public ResponseEntity<List<ChatMessage>> getMessages(@PathVariable Long roomId) {
+		return ResponseEntity.ok(chatMessageService.getMessages(roomId));
 	}
 }

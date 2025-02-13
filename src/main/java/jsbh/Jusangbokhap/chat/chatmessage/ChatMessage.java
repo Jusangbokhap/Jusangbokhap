@@ -44,14 +44,18 @@ public class ChatMessage {
 		this.read = read;
 	}
 
-	public static ChatMessage toEntity(Long roomId, ChatMessageRequest dto) {
+	public static ChatMessage toEntity(ChatMessageRequest dto) {
 		return ChatMessage.builder()
-			.roomId(roomId)
+			.roomId(dto.getRoomId())
 			.senderId(dto.getSenderId())
 			.receiverId(dto.getReceiverId())
 			.message(dto.getMessage())
 			.timestamp(Date.from(Instant.now()))
 			.read(false)
 			.build();
+	}
+
+	public void updateReadStatus(boolean isRead) {
+		this.read = isRead;
 	}
 }
