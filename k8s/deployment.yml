@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jusangbokhap-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jusangbokhap-app
+  template:
+    metadata:
+      labels:
+        app: jusangbokhap-app
+    spec:
+      containers:
+        - name: jusangbokhap-app
+          image: 850995539111.dkr.ecr.ap-northeast-2.amazonaws.com/jusangbokhap
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/health
+            initialDelaySeconds: 30
+            periodSeconds: 10
