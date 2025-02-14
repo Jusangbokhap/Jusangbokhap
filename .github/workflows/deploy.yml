@@ -70,6 +70,7 @@ jobs:
 
       - name: Create/Update k8s secrets
         run: |
+          kubectl delete secret jusangbokhap-secret --ignore-not-found
           kubectl create secret generic jusangbokhap-secret \
             --from-literal=POSTGRES_URL=${{ secrets.POSTGRES_URL }} \
             --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
@@ -81,7 +82,6 @@ jobs:
             --from-literal=MONGO_PORT=${{ secrets.MONGO_PORT }} \
             --from-literal=MONGO_DB=${{ secrets.MONGO_DB }} \
             --from-literal=REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
-            --dry-run=client -o yaml | kubectl replace --force -f -
 
       - name: Install Helm
         uses: azure/setup-helm@v3
