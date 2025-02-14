@@ -1,8 +1,6 @@
 package jsbh.Jusangbokhap.api.accommodation.service;
 
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest.Create;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
@@ -36,23 +34,12 @@ public class AccommodationHostService {
         return new AccommodationResponse.Create(accommodation.getAccommodationId());
     }
 
-    public AccommodationResponse findByAccommodationId(Long accommodationId) {
-        return AccommodationMapper.toResponse(getAccommodationByAccommodationId(accommodationId));
-    }
-
-    public List<AccommodationResponse> findByHostId(Long hostId) {
-        List<Accommodation> accommodations = getAccommodationByHostId(hostId);
-
-        List<AccommodationResponse> responses = new ArrayList<>();
-        for (Accommodation accommodation : accommodations) {
-            responses.add(AccommodationMapper.toResponse(accommodation));
-        }
-
-        return responses;
+    public AccommodationResponse find(Long accommodationId) {
+        return AccommodationMapper.toResponse(findById(accommodationId));
     }
 
     public AccommodationResponse update(Long accommodationId, AccommodationRequest.Update request) {
-        Accommodation accommodation = getAccommodationByAccommodationId(accommodationId);
+        Accommodation accommodation = findById(accommodationId);
 
         accommodation.updateDetails(
                 request.title(),
@@ -72,11 +59,6 @@ public class AccommodationHostService {
 
 
     public AccommodationResponse delete(Long accommodationId) {
-        accommodationRepository.delete(getAccommodationByAccommodationId(accommodationId));
-        return new AccommodationResponse.Delete(accommodationId);
-    }
-
-    private Accommodation getAccommodationByAccommodationId(Long accommodationId) {
         accommodationRepository.delete(findById(accommodationId));
         return new AccommodationResponse.Delete(accommodationId);
     }
@@ -85,11 +67,6 @@ public class AccommodationHostService {
         return accommodationRepository
                 .findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new AccommodationCustomException(AccommodationErrorCode.NOT_FOUND_ACCOMMODATION));
-    }
-
-
-    private List<Accommodation> getAccommodationByHostId(Long hostId) {
-        return accommodationRepository.findByHostId(hostId);
     }
 
         //TODO 분리 예정
