@@ -40,11 +40,12 @@ jobs:
 
       - name: Wait for ECK Operator
         run: |
-          kubectl wait --for=condition=available --timeout=300s deployment/elastic-operator -n elastic-system
+          kubectl wait --for=condition=exists namespace/elastic-system --timeout=60s
+          kubectl wait --for=condition=available --timeout=300s deployment/elastic-operator-controller-manager
 
       - name: Deploy Elasticsearch
         run: |
-          kubectl apply -f k8s/elasticsearch/
+          kubectl apply -f k8s/elasticsearch/ -n elasticsearch
 
       - name: Wait for Elasticsearch
         run: |
