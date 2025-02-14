@@ -39,6 +39,7 @@ public class ReceiptService {
         KakaoPayOrderResponseDto.AmountDto amountDto = responseDto.getAmount();
 
         long totalAmount = amountDto.getTotalAmount();
+        long cancelAmount = amountDto.getTotalAmount() - amountDto.getTaxFreeAmount(); // ✅ 취소 금액 추가
         long taxFree = amountDto.getTaxFreeAmount();
         long vat = amountDto.getVatAmount();
         long discount = amountDto.getDiscountAmount();
@@ -53,17 +54,18 @@ public class ReceiptService {
         } else if ("CANCELED".equals(responseDto.getStatus())) {
             payment.updatePaymentOnFailure();
             receiptStatus = ReceiptStatus.CANCELED;
+            adjustRevenueAfterCancellation(payment.getReservation().getAccommodation().getAccommodationId(), cancelAmount); // ✅ 취소된 금액 반영
         } else {
             log.warn("❌ 결제 실패로 인해 영수증을 발급하지 않습니다. tid={}", responseDto.getTid());
             payment.updatePaymentOnFailure();
             return;
         }
 
-        Receipt receipt = createReceipt(payment, receiptStatus, fee, profit);
+        Receipt receipt = createReceipt(payment, receiptStatus, fee, profit, cancelAmount);
         receiptRepository.save(receipt);
     }
 
-    private Receipt createReceipt(Payment payment, ReceiptStatus status, long fee, long profit) {
+    private Receipt createReceipt(Payment payment, ReceiptStatus status, long fee, long profit, long cancelAmount) {
         Reservation reservation = payment.getReservation();
         return Receipt.builder()
                 .host(reservation.getAccommodation().getHost())
@@ -72,6 +74,7 @@ public class ReceiptService {
                 .totalAmount(payment.getPrice().longValue())
                 .fee(fee)
                 .profit(profit)
+                .cancelAmount(cancelAmount)
                 .givenAt(LocalDateTime.now())
                 .receiptStatus(status)
                 .build();
@@ -152,5 +155,22 @@ public class ReceiptService {
                 netRevenue,
                 new ReceiptSummaryDto.ReceiptStatusCount(givenCount, canceledCount, failedCount)
         );
+    }
+
+    @Transactional
+    public void adjustRevenueAfterCancellation(Long accommodationId, long cancelAmount) {
+        List<Receipt> receipts = receiptRepository.findAllByAccommodationAndPeriod(
+                accommodationId, null, null, List.of(ReceiptStatus.GIVEN, ReceiptStatus.CANCELED)
+        );
+
+        long totalCanceled = receipts.stream()
+                .mapToLong(Receipt::getCancelAmount)
+                .sum() + cancelAmount;
+
+        long netRevenue = receipts.stream()
+                .mapToLong(Receipt::getTotalAmount)
+                .sum() - totalCanceled;
+
+        log.info("📢 [매출 정정] 숙소 ID={}, 취소된 금액={}, 순수익={}", accommodationId, totalCanceled, netRevenue);
     }
 }
