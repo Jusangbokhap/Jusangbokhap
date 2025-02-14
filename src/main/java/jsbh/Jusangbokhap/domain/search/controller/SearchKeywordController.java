@@ -3,6 +3,7 @@ package jsbh.Jusangbokhap.domain.search.controller;
 import jsbh.Jusangbokhap.api.search.dto.request.SearchKeywordRequest;
 import jsbh.Jusangbokhap.api.search.dto.response.SearchKeywordRankResponse;
 import jsbh.Jusangbokhap.api.search.dto.response.SearchKeywordResponse;
+import jsbh.Jusangbokhap.api.search.service.SearchKeywordRedisService;
 import jsbh.Jusangbokhap.api.search.service.SearchKeywordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +16,17 @@ import java.util.List;
 @RequestMapping("/api/search")
 public class SearchKeywordController {
 
-    private final SearchKeywordService searchKeywordService;
+    private final SearchKeywordService keywordService;
+    private final SearchKeywordRedisService keywordRedisService;
 
     @PostMapping
     public SearchKeywordResponse search(@RequestBody SearchKeywordRequest keywordRequest) throws IOException {
-        return searchKeywordService.saveKeyword(keywordRequest);
+        return keywordService.saveKeyword(keywordRequest);
     }
 
     @GetMapping("/rank")
-    public List<SearchKeywordRankResponse> searchKeywordRank() throws IOException {
-        return searchKeywordService.getTopNKeywords(10);
+    public List<SearchKeywordRankResponse> searchKeywordRank() {
+        return keywordRedisService.getTopKeywordFromRedis();
     }
 
 
