@@ -38,3 +38,4 @@ out/
 
 ### private info ###
 .env
+k8s/*secret*.yml

@@ -1,0 +1,145 @@
+name: Deploy to Amazon EKS
+
+on:
+  push:
+    branches:
+      - "main"
+      - "dev"
+      - "KR-123-chore/kr-123"
+    paths-ignore:
+      - '.github/workflows/**'
+
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPOSITORY: jusangbokhap
+  EKS_CLUSTER_NAME: community-cluster
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build -x test
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Generate short SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build_image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Update kube config
+        run: aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name $EKS_CLUSTER_NAME
+
+      - name: Create/Update k8s secrets
+        run: |
+          kubectl delete secret jusangbokhap-secret --ignore-not-found
+          kubectl create secret generic jusangbokhap-secret --from-literal=REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} --from-literal=POSTGRES_URL=${{ secrets.POSTGRES_URL }} --from-literal=POSTGRES_USER=${{ secrets.POSTGRES_USER }} --from-literal=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} --from-literal=POSTGRES_DB=${{ secrets.POSTGRES_DB }} --from-literal=MONGO_PORT=${{ secrets.MONGO_PORT }} --from-literal=MONGO_USER=${{ secrets.MONGO_USER }} --from-literal=MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} --from-literal=MONGO_DB=${{ secrets.MONGO_DB }} --from-literal=MONGO_HOST=${{ secrets.MONGO_HOST }}
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+
+      - name: Deploy to EKS
+        run: |
+          kubectl apply -f k8s/redis-deployment.yml
+          
+          sed -i "s|image:.*|image: ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ steps.vars.outputs.sha_short }}|" k8s/deployment.yml
+          kubectl apply -f k8s/
+
+      - name: Deploy Monitoring Stack
+        run: |
+          kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+          helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
+            --namespace monitoring \
+            --set grafana.adminPassword=${{ secrets.GRAFANA_ADMIN_PASSWORD }} \
+            --set grafana.service.type=LoadBalancer \
+            --set grafana.persistence.enabled=true \
+            --set grafana.persistence.storageClassName=gp2 \
+            --set grafana.persistence.size=10Gi \
+            --set prometheus.prometheusSpec.retention=15d \
+            --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName=gp2 \
+            --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=10Gi
+
+      - name: Deploy ServiceMonitor
+        run: |
+          cat << EOF | kubectl apply -f -
+          apiVersion: monitoring.coreos.com/v1
+          kind: ServiceMonitor
+          metadata:
+            name: jusangbokhap-monitor
+            namespace: monitoring
+            labels:
+              release: prometheus
+              app: jusangbokhap-app
+          spec:
+            jobLabel: jusangbokhap-app
+            selector:
+              matchLabels:
+                app: jusangbokhap-app
+            namespaceSelector:
+              matchNames:
+                - default
+            endpoints:
+            - port: http
+              path: /actuator/prometheus
+              interval: 15s
+              scrapeTimeout: 10s
+              honorLabels: true
+              metricRelabelings:
+                - sourceLabels: [__name__]
+                  regex: 'jvm_.*'
+                  action: keep
+              relabelings:
+                - sourceLabels: [__meta_kubernetes_pod_name]
+                  targetLabel: pod
+                - sourceLabels: [__meta_kubernetes_namespace]
+                  targetLabel: namespace
+                - sourceLabels: [__meta_kubernetes_service_name]
+                  targetLabel: service
+          EOF
+
+      - name: Wait for Monitoring Stack
+        run: |
+          kubectl wait --for=condition=ready pod -l "app.kubernetes.io/instance=prometheus" -n monitoring --timeout=300s
+          echo "Prometheus Stack is ready!"
