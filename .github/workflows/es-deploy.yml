@@ -53,7 +53,7 @@ jobs:
       - name: Get Elasticsearch Password
         id: get-password
         run: |
-          PASSWORD=$(kubectl get secret jusangbokhap-es-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')
+          PASSWORD=$(kubectl get secret jusangbokhap-es-es-elastic-user -n elasticsearch -o go-template='{{.data.elastic | base64decode}}')
           echo "ES_PASSWORD=$PASSWORD" >> $GITHUB_ENV
 
       - name: Store ES Password in GitHub Secret
