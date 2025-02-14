@@ -66,8 +66,8 @@ jobs:
 
       - name: Verify Elasticsearch Connection
         run: |
-          POD_NAME=$(kubectl get pods -l elasticsearch.k8s.elastic.co/cluster-name=jusangbokhap-es -o jsonpath='{.items[0].metadata.name}')
-          kubectl exec $POD_NAME -- curl -u "elastic:${ES_PASSWORD}" -k https://localhost:9200/_cluster/health
+          POD_NAME=$(kubectl get pods -n elasticsearch -l elasticsearch.k8s.elastic.co/cluster-name=jusangbokhap-es -o jsonpath='{.items[0].metadata.name}')
+          kubectl exec $POD_NAME -n elasticsearch -- curl -u "elastic:${ES_PASSWORD}" -k https://localhost:9200/_cluster/health
 
       - name: Get Elasticsearch logs if failed
         if: failure()
