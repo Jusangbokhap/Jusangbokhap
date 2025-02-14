@@ -13,6 +13,7 @@ import jsbh.Jusangbokhap.domain.accommodation.AccommodationCapacity;
 public class AccommodationMapper {
     public static Accommodation toEntity(Create dto) {
         return Accommodation.builder()
+                .name(dto.name())
                 .address(dto.address())
                 .accommodationPrice(new AccommodationPrice(dto.price()))
                 .accommodationType(AccommodationType.from(dto.accommodationType()))

@@ -5,6 +5,7 @@ import jsbh.Jusangbokhap.api.availableDate.dto.AvailableDateRequest;
 
 public interface AccommodationRequest {
     record Create(
+            String name,
             String address,
             String description,
             Integer price,

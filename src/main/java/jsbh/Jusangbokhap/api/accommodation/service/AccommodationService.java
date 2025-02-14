@@ -59,7 +59,7 @@ public class AccommodationService {
         return new AccommodationResponse.Delete(accommodationId);
     }
 
-    private Accommodation findById(Long accommodationId) {
+    public Accommodation findById(Long accommodationId) {
         return accommodationRepository
                 .findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new AccommodationCustomException(AccommodationErrorCode.NOT_FOUND_ACCOMMODATION));
