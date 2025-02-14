@@ -43,10 +43,6 @@ jobs:
         run: |
           kubectl apply -f k8s/elasticsearch/ -n elasticsearch
 
-      - name: Wait for Elasticsearch
-        run: |
-          kubectl wait --for=condition=ready --timeout=300s elasticsearch/jusangbokhap-es -n elasticsearch
-
       - name: Get Elasticsearch Status
         run: |
           echo "Checking Elasticsearch cluster status..."
