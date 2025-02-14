@@ -76,12 +76,7 @@ public class AccommodationHostService {
         return new AccommodationResponse.Delete(accommodationId);
     }
 
-    private Accommodation getAccommodationByAccommodationId(Long accommodationId) {
-        accommodationRepository.delete(findById(accommodationId));
-        return new AccommodationResponse.Delete(accommodationId);
-    }
-
-    private Accommodation findById(Long accommodationId) {
+    public Accommodation getAccommodationByAccommodationId(Long accommodationId) {
         return accommodationRepository
                 .findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new AccommodationCustomException(AccommodationErrorCode.NOT_FOUND_ACCOMMODATION));

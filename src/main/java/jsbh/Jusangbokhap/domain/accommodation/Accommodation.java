@@ -69,9 +69,11 @@ public class Accommodation extends BaseEntity {
     @JoinColumn(name = "host_id", nullable = true)
     private User host;
 
+    @Builder.Default
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailableDate> availableDates = new ArrayList<>();
 
