@@ -7,7 +7,6 @@ import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
 import jsbh.Jusangbokhap.api.accommodation.exception.AccommodationCustomException;
 import jsbh.Jusangbokhap.api.accommodation.exception.AccommodationErrorCode;
 import jsbh.Jusangbokhap.api.accommodation.mapper.AccommodationMapper;
-import jsbh.Jusangbokhap.api.availableDate.service.AvailableDateService;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.accommodation.repository.AccommodationRepository;
 import jsbh.Jusangbokhap.domain.availableDate.AvailableDate;
@@ -17,10 +16,9 @@ import org.springframework.stereotype.Service;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AccommodationService {
+public class AccommodationHostService {
 
     private final AccommodationRepository accommodationRepository;
-    private final AvailableDateService availableDateService;
 
     public AccommodationResponse create(Create request) {
 
@@ -44,11 +42,17 @@ public class AccommodationService {
         Accommodation accommodation = findById(accommodationId);
 
         accommodation.updateDetails(
-                request.address(),
+                request.title(),
+                request.sido(),
+                request.sigungu(),
+                request.eupmyeondong(),
+                request.detail(),
+                request.longitude(),
+                request.latitude(),
                 request.description(),
                 request.price(),
                 request.accommodationType(),
-                request.personnel());
+                request.guests());
 
         return new AccommodationResponse.Update(accommodationId);
     }
