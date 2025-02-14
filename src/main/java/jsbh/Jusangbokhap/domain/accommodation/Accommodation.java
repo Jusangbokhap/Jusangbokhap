@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import jsbh.Jusangbokhap.domain.BaseEntity;
@@ -33,16 +34,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Accommodation extends BaseEntity {
 
-
-    public static final Integer MIN_PERSON = 0;
-    public static final Integer MAX_PERSON = 0;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accommodationId;
 
     @Column(nullable = false)
-    private String address;
+    private String title;
+
+    @Column(nullable = false)
+    private String businessName;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "accommodationAddress_id")
+    private AccommodationAddress address;
 
     @Column(nullable = false)
     @Embedded
@@ -71,27 +75,34 @@ public class Accommodation extends BaseEntity {
     @OneToMany(mappedBy = "accommodation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailableDate> availableDates = new ArrayList<>();
 
-    public void updateDetails(String address,
-                              String description,
-                              Integer price,
-                              String accommodationType,
-                              Integer personnel) {
+    public void updateDetails(
+                            String title,
+                            String sido,
+                            String sigungu,
+                            String eupmyeondong,
+                            String detail,
+                            Double longitude,
+                            Double latitude,
+                            String description,
+                            Integer price,
+                            String accommodationType,
+                            Integer guests) {
 
-        if (address != null && !address.isEmpty()) {
-            this.address = address;
+        if (title != null && !title.isEmpty()) {
+            this.title = title;
         }
+
         if (description != null && !description.isEmpty()) {
             this.description = description;
         }
-        if (price != null) {
-            this.accommodationPrice = new AccommodationPrice(price);
-        }
+
         if (accommodationType != null) {
             this.accommodationType = AccommodationType.valueOf(accommodationType);
         }
-        if (personnel != null && personnel > MIN_PERSON) {
-            this.maxGuests = new AccommodationCapacity(personnel);
-        }
+
+        address.updateAddress(sido, sigungu, eupmyeondong, detail, longitude, latitude);
+        accommodationPrice.updatePrice(price);
+        maxGuests.updateMaxGuests(guests);
     }
 
     public AvailableDates getAvailableDates() {

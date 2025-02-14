@@ -17,7 +17,17 @@ public class AccommodationPrice {
 
     private Integer price;
 
-    public AccommodationPrice(Integer price) {
+    public static AccommodationPrice from(Integer price) {
+        return new AccommodationPrice(price);
+    }
+
+    public void updatePrice(Integer price) {
+        if (price == null) return;
+        validateAccommodationPrice(price);
+        this.price = price;
+    }
+
+    private AccommodationPrice(Integer price) {
         validateAccommodationPrice(price);
         this.price = price;
     }
