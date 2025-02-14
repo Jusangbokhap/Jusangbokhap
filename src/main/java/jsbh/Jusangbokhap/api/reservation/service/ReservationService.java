@@ -1,5 +1,7 @@
 package jsbh.Jusangbokhap.api.reservation.service;
 
+import static jsbh.Jusangbokhap.api.reservation.exception.ReservationErrorCode.NOT_FOUND_RESERVATION;
+
 import jsbh.Jusangbokhap.api.accommodation.service.AccommodationService;
 import jsbh.Jusangbokhap.api.payment.service.KakaoPayService;
 import jsbh.Jusangbokhap.api.reservation.dto.ReservationRequestDto;
@@ -110,6 +112,30 @@ public class ReservationService {
                         .reservationStatus(reservation.getReservationStatus().name())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationResponseDto> getReservations(Long userId) {
+        List<Reservation> canceledReservations = reservationRepository.findByGuest_UserId(userId);
+
+        return canceledReservations.stream()
+                .map(reservation -> ReservationResponseDto.builder()
+                        .reservationId(reservation.getReservationId())
+                        .accommodationName(reservation.getAccommodation().getName())
+                        .checkIn(reservation.getCheckIn())
+                        .checkOut(reservation.getCheckOut())
+                        .guestCount(reservation.getGuestCount())
+                        .reservationStatus(reservation.getReservationStatus().name())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationResponseDto getReservation(Long userId, Long reservationId) {
+        Reservation res = reservationRepository.findByGuest_UserIdAndReservationId(userId, reservationId)
+                .orElseThrow(() -> new ReservationCustomException(NOT_FOUND_RESERVATION));
+
+        return convertToDto(res);
     }
 
     private ReservationResponseDto convertToDto(Reservation reservation) {
