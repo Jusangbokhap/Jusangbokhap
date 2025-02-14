@@ -39,11 +39,6 @@ jobs:
           kubectl create -f https://download.elastic.co/downloads/eck/2.11.1/crds.yaml --dry-run=client -o yaml | kubectl apply -f -
           kubectl apply -f https://download.elastic.co/downloads/eck/2.11.1/operator.yaml
 
-      - name: Wait for ECK Operator
-        run: |
-          kubectl -n elastic-system wait --for=condition=ready --timeout=300s statefulset/elastic-operator
-          kubectl -n elastic-system get pods -l control-plane=elastic-operator
-
       - name: Deploy Elasticsearch
         run: |
           kubectl apply -f k8s/elasticsearch/ -n elasticsearch
