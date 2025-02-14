@@ -81,7 +81,7 @@ jobs:
             --from-literal=MONGO_PORT=${{ secrets.MONGO_PORT }} \
             --from-literal=MONGO_DB=${{ secrets.MONGO_DB }} \
             --from-literal=REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
-            --dry-run=client -o yaml | kubectl apply -f -
+            --dry-run=client -o yaml | kubectl replace --froce -f -
 
       - name: Install Helm
         uses: azure/setup-helm@v3
