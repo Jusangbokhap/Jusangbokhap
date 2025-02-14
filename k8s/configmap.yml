@@ -11,7 +11,7 @@ data:
   SPRING_JPA_SHOW_SQL: "false"
   SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
 
-  SPRING_DATA_MONGODB_URI: "mongodb+srv://jinho7329:${MONGO_PASSWORD}@cluster0.5ly7k.mongodb.net/jusangbokhap?retryWrites=true&w=majority"
+  SPRING_DATA_MONGODB_URI: "mongodb+srv://jinho7329:${MONGO_PASSWORD}@cluster0.5ly7k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
   SPRING_DATA_MONGODB_DATABASE: "jusangbokhap"
   SPRING_DATA_MONGODB_SSL_ENABLED: "true"
 
