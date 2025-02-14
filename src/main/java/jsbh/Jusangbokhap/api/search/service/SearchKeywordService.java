@@ -27,6 +27,7 @@ public class SearchKeywordService {
     @Value("${elasticsearch.custom.search.top-index-name}")
     private String SEARCH_AGGS_RESULT_NAME;
     private final ElasticsearchClient esClient;
+    private static final int SEARCH_LIMIT = 10;
 
     // 검색 시, 키워드 저장
     public SearchKeywordResponse saveKeyword(SearchKeywordRequest keywordRequest) throws IOException {
@@ -42,8 +43,8 @@ public class SearchKeywordService {
         return SearchKeywordResponse.of(response.id(), keywordDocument);
     }
 
-    // 상위 검색어 반환 (집계, Aggregation 사용)
-    public List<SearchKeywordRankResponse> getTopNKeywords(int n) throws IOException {
+    // es 에서 상위 검색어 반환 후 redis 캐시에 저장 (집계, Aggregation 사용)
+    public List<SearchKeywordRankResponse> getTopNKeywords() throws IOException {
 
         // will add try-catch exception
         SearchResponse<Void> response = esClient.search(s -> s
@@ -52,7 +53,7 @@ public class SearchKeywordService {
                         .aggregations(SEARCH_AGGS_RESULT_NAME, a -> a
                                 .terms(t -> t
                                         .field("keyword.keyword")
-                                        .size(n) // 상위 n개 키워드 반환
+                                        .size(SEARCH_LIMIT) // 상위 SEARCH_LIMIT 개 키워드 반환
                                 )
                         ),
                 Void.class
@@ -60,12 +61,11 @@ public class SearchKeywordService {
 
         List<SearchKeywordRankResponse> rankList = new ArrayList<>();
         StringTermsAggregate termsAggregate = response.aggregations().get(SEARCH_AGGS_RESULT_NAME).sterms();
-        int rank = 1;
+
         for (StringTermsBucket bucket : termsAggregate.buckets().array()) {
             String key = bucket.key().stringValue();
             long docCount = bucket.docCount();
-
-            rankList.add(SearchKeywordRankResponse.of(rank++, key, docCount));
+            rankList.add(SearchKeywordRankResponse.of(key, docCount));
         }
 
         return rankList;

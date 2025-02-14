@@ -19,4 +19,11 @@ public class SearchKeywordRankResponse {
                 .build();
     }
 
+    public static SearchKeywordRankResponse of(String keyword, Long count) {
+        return SearchKeywordRankResponse.builder()
+                .keyword(keyword)
+                .count(count)
+                .build();
+    }
+
 }
