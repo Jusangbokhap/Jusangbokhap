@@ -1,5 +1,6 @@
 package jsbh.Jusangbokhap.domain.availableDate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +18,16 @@ public class AvailableDates {
             return;
         }
         this.availableDates = new ArrayList<>();
+    }
+
+    public AvailableDate findReservableDate(LocalDate checkin, LocalDate checkout) {
+        for (AvailableDate availableDate : availableDates) {
+            AvailableDate reservation = availableDate.matchDates(checkin, checkout);
+            if (reservation != null) {
+                return reservation;
+            }
+        }
+        return null;
     }
 
     public List<AvailableDate> getDates() {

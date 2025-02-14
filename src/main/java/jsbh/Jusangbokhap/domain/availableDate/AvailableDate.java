@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Version;
 import java.time.LocalDate;
 import jsbh.Jusangbokhap.api.availableDate.exception.AvailableDateCustomException;
 import jsbh.Jusangbokhap.api.availableDate.exception.AvailableDateErrorCode;
@@ -40,6 +41,9 @@ public class AvailableDate {
     @Enumerated(EnumType.STRING)
     private AvailableDateStatus status;
 
+    @Version
+    private Long version;
+
     protected void setAccommodation(Accommodation accommodation) {
         this.accommodation = accommodation;
     }
@@ -50,6 +54,21 @@ public class AvailableDate {
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
+    }
+
+    public AvailableDate matchDates(LocalDate checkin, LocalDate checkout) {
+        if (this.startDate.equals(checkin) && this.endDate.equals(checkout)) {
+            return this;
+        }
+        return null;
+    }
+
+    public boolean isAvailable() {
+        return this.status == AvailableDateStatus.AVAILABLE;
+    }
+
+    public void updateStatus() {
+        this.status = AvailableDateStatus.BOOKED;
     }
 
     public void updateDate(LocalDate startDate, LocalDate endDate, AvailableDateStatus status) {

@@ -1,6 +1,7 @@
 package jsbh.Jusangbokhap.api.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jsbh.Jusangbokhap.api.reservation.dto.ReservationRequestDto;
 import jsbh.Jusangbokhap.api.reservation.dto.ReservationResponseDto;
 import jsbh.Jusangbokhap.api.reservation.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,13 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+
+    @Operation(summary = "숙소 예약 API", description = "사용자가 선택한 숙소에 대해 예약을 생성하는 API")
+    @PostMapping
+    public ResponseEntity<ReservationResponseDto> createReservation(@RequestBody ReservationRequestDto request) {
+        ReservationResponseDto response = reservationService.createReservation(request);
+        return ResponseEntity.ok(response);
+    }
 
     @Operation(summary = "숙소 예약 취소 API", description = "사용자가 예약 취소를 요청하면 예약한 숙소 취소 및 결제한 금액이 환불됩니다.")
     @PostMapping("/cancel")
