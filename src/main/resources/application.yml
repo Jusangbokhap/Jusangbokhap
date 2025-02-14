@@ -48,7 +48,7 @@ management:
       show-details: always
     prometheus:
       enabled: true
-
+      
 ---
 spring:
   config:
@@ -121,7 +121,6 @@ management:
       show-details: when_authorized
     prometheus:
       enabled: true
-
 
 server:
   port: 8080
