@@ -62,7 +62,7 @@ class KakaoPayServiceTest {
     }
 
     /**
-     * 📌 1️⃣ 결제 요청 테스트 (성공)
+     * 1️⃣ 결제 요청 테스트 (성공)
      */
     @Test
     void requestPayment_Success() {
@@ -93,7 +93,7 @@ class KakaoPayServiceTest {
     }
 
     /**
-     * 📌 2️⃣ 결제 승인 테스트 (성공)
+     * 2️⃣ 결제 승인 테스트 (성공)
      */
     @Test
     void approvePayment_Success() {
@@ -127,7 +127,7 @@ class KakaoPayServiceTest {
     }
 
     /**
-     * 📌 3️⃣ 결제 승인 실패 테스트 (잘못된 PG 토큰)
+     * 3️⃣ 결제 승인 실패 테스트 (잘못된 PG 토큰)
      */
     // 디버깅 진행하고 있음
 //    @Test
@@ -151,7 +151,7 @@ class KakaoPayServiceTest {
 
 
     /**
-     * 📌 4️⃣ 결제 취소 테스트 (성공)
+     * 4️⃣ 결제 취소 테스트 (성공)
      */
     @Test
     void cancelPayment_Success() {
@@ -185,7 +185,7 @@ class KakaoPayServiceTest {
     }
 
     /**
-     * 📌 5️⃣ 결제 취소 실패 테스트 (TID가 존재하지 않을 경우)
+     * 5️⃣ 결제 취소 실패 테스트 (TID가 존재하지 않을 경우)
      */
     @Test
     void cancelPayment_Fail_TidNotFound() {
