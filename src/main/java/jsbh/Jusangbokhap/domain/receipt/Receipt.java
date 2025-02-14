@@ -39,4 +39,6 @@ public class Receipt {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReceiptStatus receiptStatus;
+
+    private Long cancelAmount;
 }
