@@ -26,6 +26,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
 	// 세션에 있는 모든 사용자 저장
 	private static final Map<Long, WebSocketSession> sessions = new HashMap<>();
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
@@ -69,7 +70,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-		ObjectMapper objectMapper = new ObjectMapper();
 		ChatMessageRequest dto = objectMapper.readValue(message.getPayload(), ChatMessageRequest.class);
 
 		ChatMessage chatMessage = ChatMessage.toEntity(dto);
@@ -98,7 +98,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 			chatMessage.updateReadStatus(true);
 			chatMessageRepository.save(chatMessage);
 
-			ObjectMapper objectMapper = new ObjectMapper();
 			String messageJson = objectMapper.writeValueAsString(chatMessage);
 			receiverSession.sendMessage(new TextMessage(messageJson));
 		}
