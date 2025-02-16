@@ -88,7 +88,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		Long userId = getUserIdFromSession(session);
-		sessions.remove(userId);
+		if (userId != null) {
+			sessions.remove(userId);
+		}
+
+		try {
+			session.close();
+		} catch (Exception e) {
+			log.error("Error while closing WebSocket session for user {}", userId, e);
+		}
 	}
 
 	// 특정 사용자에게 메시지 보내기
