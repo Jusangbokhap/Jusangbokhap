@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
-@EnableMongoRepositories(basePackages = "jsbh.Jusangbokhap.chat.chatmessage")
+@EnableMongoRepositories(basePackages = "jsbh.Jusangbokhap.domain.chat.repository.mongodb")
 @ImportAutoConfiguration(exclude = {
 	DataSourceAutoConfiguration.class,
 	HibernateJpaAutoConfiguration.class,
