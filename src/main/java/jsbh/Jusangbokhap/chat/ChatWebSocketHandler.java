@@ -4,6 +4,7 @@ import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.stereotype.Component;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,7 +26,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 	private final ChatRoomService chatRoomService;
 
 	// 세션에 있는 모든 사용자 저장
-	private static final Map<Long, WebSocketSession> sessions = new HashMap<>();
+	private static final Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
