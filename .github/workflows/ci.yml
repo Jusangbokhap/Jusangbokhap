@@ -19,7 +19,6 @@ jobs:
       mongodb:
         image: mongo:latest
         ports: [ '27017:27017' ]
-        command: --noauth
       postgres:
         image: postgres:15
         ports: [ '5432:5432' ]
