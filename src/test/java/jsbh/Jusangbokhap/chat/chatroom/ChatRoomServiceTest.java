@@ -14,6 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import jsbh.Jusangbokhap.api.chat.service.ChatRoomService;
+import jsbh.Jusangbokhap.domain.chat.entity.jpa.ChatRoom;
+import jsbh.Jusangbokhap.domain.chat.repository.jpa.ChatRoomRepository;
+
 @ExtendWith(MockitoExtension.class)
 class ChatRoomServiceTest {
 

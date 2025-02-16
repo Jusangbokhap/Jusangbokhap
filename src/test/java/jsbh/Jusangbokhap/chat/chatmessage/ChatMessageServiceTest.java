@@ -3,7 +3,6 @@ package jsbh.Jusangbokhap.chat.chatmessage;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import jsbh.Jusangbokhap.api.chat.service.ChatMessageService;
+import jsbh.Jusangbokhap.domain.chat.entity.mongodb.ChatMessage;
+import jsbh.Jusangbokhap.domain.chat.repository.mongodb.ChatMessageRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class ChatMessageServiceTest {

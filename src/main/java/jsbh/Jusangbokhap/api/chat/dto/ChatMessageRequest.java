@@ -1,4 +1,4 @@
-package jsbh.Jusangbokhap.chat.chatmessage;
+package jsbh.Jusangbokhap.api.chat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

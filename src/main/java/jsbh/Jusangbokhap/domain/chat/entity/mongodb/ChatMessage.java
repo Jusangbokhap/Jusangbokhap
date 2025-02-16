@@ -1,4 +1,4 @@
-package jsbh.Jusangbokhap.chat.chatmessage;
+package jsbh.Jusangbokhap.domain.chat.entity.mongodb;
 
 import java.time.Instant;
 import java.util.Date;
@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jsbh.Jusangbokhap.api.chat.dto.ChatMessageRequest;
 import lombok.*;
 
 @Document(collection = "chat_messages")

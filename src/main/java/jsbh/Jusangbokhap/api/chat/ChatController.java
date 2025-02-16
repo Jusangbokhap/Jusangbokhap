@@ -1,14 +1,13 @@
-package jsbh.Jusangbokhap.chat;
+package jsbh.Jusangbokhap.api.chat;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-import jsbh.Jusangbokhap.chat.chatmessage.ChatMessage;
-import jsbh.Jusangbokhap.chat.chatmessage.ChatMessageService;
-import jsbh.Jusangbokhap.chat.chatroom.ChatRoom;
-import jsbh.Jusangbokhap.chat.chatroom.ChatRoomService;
+import jsbh.Jusangbokhap.api.chat.service.ChatMessageService;
+import jsbh.Jusangbokhap.api.chat.service.ChatRoomService;
+import jsbh.Jusangbokhap.domain.chat.entity.mongodb.ChatMessage;
+import jsbh.Jusangbokhap.domain.chat.entity.jpa.ChatRoom;
 import lombok.RequiredArgsConstructor;
 
 @RestController

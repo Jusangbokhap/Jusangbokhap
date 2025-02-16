@@ -1,10 +1,12 @@
-package jsbh.Jusangbokhap.chat.chatroom;
+package jsbh.Jusangbokhap.api.chat.service;
 
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+import jsbh.Jusangbokhap.domain.chat.entity.jpa.ChatRoom;
+import jsbh.Jusangbokhap.domain.chat.repository.jpa.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service

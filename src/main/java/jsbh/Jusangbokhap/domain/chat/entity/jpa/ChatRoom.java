@@ -1,4 +1,4 @@
-package jsbh.Jusangbokhap.chat.chatroom;
+package jsbh.Jusangbokhap.domain.chat.entity.jpa;
 
 import jakarta.persistence.*;
 import jsbh.Jusangbokhap.domain.BaseEntity;

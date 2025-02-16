@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 
 import jsbh.Jusangbokhap.chat.MongoTestConfig;
+import jsbh.Jusangbokhap.domain.chat.entity.mongodb.ChatMessage;
+import jsbh.Jusangbokhap.domain.chat.repository.mongodb.ChatMessageRepository;
 
 @DataMongoTest
 @Import(MongoTestConfig.class)
