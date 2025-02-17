@@ -44,11 +44,17 @@ public class AccommodationService {
         Accommodation accommodation = findById(accommodationId);
 
         accommodation.updateDetails(
-                request.address(),
+                request.title(),
+                request.sido(),
+                request.sigungu(),
+                request.eupmyeondong(),
+                request.detail(),
+                request.longitude(),
+                request.latitude(),
                 request.description(),
                 request.price(),
                 request.accommodationType(),
-                request.personnel());
+                request.guests());
 
         return new AccommodationResponse.Update(accommodationId);
     }

@@ -69,8 +69,8 @@ public class ReservationService {
 
         Reservation reservation = Reservation.builder()
                 .accommodation(accommodation)
-                .checkIn(availableDate.getStartDate())
-                .checkOut(availableDate.getEndDate())
+                .checkIn(availableDate.getCheckin())
+                .checkOut(availableDate.getCheckout())
                 .guestCount(guests)
                 .reservationStatus(ReservationStatus.PENDING)
                 .build();
@@ -105,7 +105,7 @@ public class ReservationService {
         return canceledReservations.stream()
                 .map(reservation -> ReservationResponseDto.builder()
                         .reservationId(reservation.getReservationId())
-                        .accommodationName(reservation.getAccommodation().getName())
+                        .accommodationName(reservation.getAccommodation().getTitle())
                         .checkIn(reservation.getCheckIn())
                         .checkOut(reservation.getCheckOut())
                         .guestCount(reservation.getGuestCount())
@@ -121,7 +121,7 @@ public class ReservationService {
         return canceledReservations.stream()
                 .map(reservation -> ReservationResponseDto.builder()
                         .reservationId(reservation.getReservationId())
-                        .accommodationName(reservation.getAccommodation().getName())
+                        .accommodationName(reservation.getAccommodation().getTitle())
                         .checkIn(reservation.getCheckIn())
                         .checkOut(reservation.getCheckOut())
                         .guestCount(reservation.getGuestCount())
@@ -141,7 +141,7 @@ public class ReservationService {
     private ReservationResponseDto convertToDto(Reservation reservation) {
         return ReservationResponseDto.builder()
                 .reservationId(reservation.getReservationId())
-                .accommodationName(reservation.getAccommodation().getName())
+                .accommodationName(reservation.getAccommodation().getTitle())
                 .checkIn(reservation.getCheckIn())
                 .checkOut(reservation.getCheckOut())
                 .guestCount(reservation.getGuestCount())
