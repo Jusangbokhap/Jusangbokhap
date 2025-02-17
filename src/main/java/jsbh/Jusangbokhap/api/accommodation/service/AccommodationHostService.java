@@ -83,6 +83,7 @@ public class AccommodationHostService {
                 .orElseThrow(() -> new AccommodationCustomException(AccommodationErrorCode.NOT_FOUND_ACCOMMODATION));
     }
 
+
     private List<Accommodation> getAccommodationByHostId(Long hostId) {
         return accommodationRepository.findByHostId(hostId);
     }
