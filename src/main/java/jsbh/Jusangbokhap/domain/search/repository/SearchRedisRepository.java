@@ -52,5 +52,4 @@ public class SearchRedisRepository {
 
         return rankList;
     }
-
 }
