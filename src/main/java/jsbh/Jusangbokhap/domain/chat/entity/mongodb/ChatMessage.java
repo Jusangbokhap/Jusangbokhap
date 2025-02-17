@@ -15,6 +15,7 @@ import lombok.*;
 @Document(collection = "chat_messages")
 @Getter
 @NoArgsConstructor
+@Builder
 public class ChatMessage {
 
 	@Id
