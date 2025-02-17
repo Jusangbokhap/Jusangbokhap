@@ -45,5 +45,4 @@ public class SearchKeywordRedisService {
     public List<SearchKeywordRankResponse> getTopKeywordFromRedis() {
         return searchRedisRepository.getAllSearchKeyword(RANK_REDIS_KEY);
     }
-
 }
