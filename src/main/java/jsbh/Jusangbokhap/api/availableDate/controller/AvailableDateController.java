@@ -1,5 +1,6 @@
 package jsbh.Jusangbokhap.api.availableDate.controller;
 
+
 import jsbh.Jusangbokhap.api.accommodation.service.AccommodationService;
 import jsbh.Jusangbokhap.api.accommodation.service.AccommodationHostService;
 
