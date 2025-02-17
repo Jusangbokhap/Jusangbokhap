@@ -1,11 +1,8 @@
 spring:
   application:
     name: Jusangbokhap
-
-  redis:
-    host: localhost
-    port: 6379
-    timeout: 60000
+  profiles:
+    active: prod
 
 logging:
   file:
@@ -16,21 +13,50 @@ logging:
 
 kakao:
   api:
-    admin-key: ""
     cid: "TC0ONETIME"
     approval-url: "https://frontend.com/payments/approve"
     cancel-url: "https://frontend.com/payments/cancel"
     fail-url: "https://frontend.com/payments/fail"
+    key: DEVC6AFF24FBF9E47EFC2005FC407B728DA9B3D3
+
+elasticsearch:
+  custom:
+    host: ${ELASTICSEARCH_HOST}
+    port: ${ELASTICSEARCH_PORT}
+    username: ${ELASTICSEARCH_USERNAME}
+    password: ${ELASTICSEARCH_PASSWORD}
+    certificate: ${ELASTICSEARCH_CERTIFICATE}
+    search:
+      index-name:
+        search-keyword
+      top-index-name:
+        top-keywords
+
+redis:
+  search:
+    rank:
+      search:rank
+    meta:
+      search:meta
+    meta-last-updated:
+      last-updated
+
+search:
+  key:
+    realtime-keywords
+  result_key:
+    realtime-keywords-result
 
 springdoc:
   api-docs:
     enabled: true
   swagger-ui:
     enabled: true
-  profiles:
-    active: prod
 
 management:
+  health:
+    elasticsearch:
+      enabled: false
   endpoints:
     web:
       exposure:
@@ -38,13 +64,12 @@ management:
   endpoint:
     health:
       show-details: always
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
   metrics:
     tags:
       application: ${spring.application.name}
+
+server:
+  port: 8080
 
 ---
 spring:
@@ -58,9 +83,9 @@ spring:
     driver-class-name: org.postgresql.Driver
   data:
     mongodb:
-      uri: mongodb://root:root@localhost:27017/chatdb?authSource=admin
-      username: root
-      password: root
+      host: localhost
+      port: 27017
+      database: jusangbokhap
       auto-index-creation: true
     redis:
       host: localhost
@@ -68,13 +93,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-
-management:
-  endpoint:
-    health:
-      show-details: always
-    prometheus:
-      enabled: true
 
 ---
 spring:
@@ -104,22 +122,22 @@ spring:
   config:
     activate:
       on-profile: prod
-  datasource:
-    url: jdbc:postgresql://${POSTGRES_URL}:5432/${POSTGRES_DB}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
-    hikari:
+    datasource:
+      url: jdbc:postgresql://172.17.0.2:5432/jusangbokhap
+      username: jusangbokhap
+      password: jusangbokhap
       driver-class-name: org.postgresql.Driver
-      maximum-pool-size: 5
-      minimum-idle: 1
-      idle-timeout: 300000
+      hikari:
+        maximum-pool-size: 5
+        minimum-idle: 1
+        idle-timeout: 300000
   data:
     mongodb:
-      uri: mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0.5ly7k.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority&appName=Cluster0
+      uri: mongodb+srv://jusangbokhap:jusangbokhap@cluster0.5ly7k.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority&appName=Cluster0
     redis:
       host: redis
       port: 6379
-      password: ${REDIS_PASSWORD}
+      password: jusangbokhap
       lettuce:
         pool:
           max-active: 8
@@ -132,7 +150,6 @@ spring:
       time-to-live: 1800000
       enable-statistics: true
   session:
-    store-type: redis
     redis:
       namespace: spring:session
       flush-mode: on_save
@@ -146,8 +163,3 @@ management:
   endpoint:
     health:
       show-details: when_authorized
-    prometheus:
-      enabled: true
-
-server:
-  port: 8080

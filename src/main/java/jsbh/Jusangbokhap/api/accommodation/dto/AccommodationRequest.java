@@ -95,7 +95,7 @@ public interface AccommodationRequest {
             @Schema(description = "최대 인원", example = "10")
             Integer guests
     ) implements AccommodationRequest {
-}
+    }
 
     record Search(
             @Schema(description = "검색할 상호명", example = "Henann Garden Resort")

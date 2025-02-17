@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import jsbh.Jusangbokhap.common.exception.CustomException;
 import jsbh.Jusangbokhap.common.exception.ErrorCode;
 import jsbh.Jusangbokhap.domain.BaseEntity;
-//import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.user.User;
 import lombok.*;
@@ -23,7 +22,7 @@ public class Reservation extends BaseEntity {
     private Long reservationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guest_id", nullable = false)
+    @JoinColumn(name = "guest_id", nullable = true)
     private User guest;
 
     @ManyToOne(fetch = FetchType.LAZY)

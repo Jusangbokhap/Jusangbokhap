@@ -1,6 +1,19 @@
 package jsbh.Jusangbokhap.domain.accommodation;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import jsbh.Jusangbokhap.domain.BaseEntity;
@@ -20,6 +33,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Accommodation extends BaseEntity {
+
+
+    public static final Integer MIN_PERSON = 0;
+    public static final Integer MAX_PERSON = 0;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,6 +68,7 @@ public class Accommodation extends BaseEntity {
     @Column
     private String imageUrl;
 
+    //TODO User Service 개발 완료 시 nullable = false 변경
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id", nullable = true)
     private User host;
@@ -65,11 +83,16 @@ public class Accommodation extends BaseEntity {
 
     public void updateDetails(
             String title,
-            AccommodationAddress newAddress,
+            String sido,
+            String sigungu,
+            String eupmyeondong,
+            String detail,
+            Double longitude,
+            Double latitude,
             String description,
-            AccommodationPrice newPrice,
-            AccommodationType accommodationType,
-            AccommodationCapacity newGuests) {
+            Integer price,
+            String accommodationType,
+            Integer guests) {
 
         if (title != null && !title.isEmpty()) {
             this.title = title;
@@ -80,20 +103,12 @@ public class Accommodation extends BaseEntity {
         }
 
         if (accommodationType != null) {
-            this.accommodationType = accommodationType;
+            this.accommodationType = AccommodationType.valueOf(accommodationType);
         }
 
-        if (newAddress != null) {
-            this.address = newAddress;
-        }
-
-        if (newPrice != null) {
-            this.accommodationPrice = newPrice;
-        }
-
-        if (newGuests != null) {
-            this.maxGuests = newGuests;
-        }
+        address.updateAddress(sido, sigungu, eupmyeondong, detail, longitude, latitude);
+        accommodationPrice.updatePrice(price);
+        maxGuests.updateMaxGuests(guests);
     }
 
     public AvailableDates getAvailableDates() {

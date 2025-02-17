@@ -22,9 +22,9 @@ import org.springframework.stereotype.Service;
 public class AccommodationHostService {
 
     private final AccommodationRepository accommodationRepository;
-    private final AccommodationService accommodationService;
 
     public AccommodationResponse create(Create request) {
+
         Accommodation accommodation = AccommodationMapper.toEntity(request);
 
         request.availableDates().forEach(date -> {
@@ -52,6 +52,26 @@ public class AccommodationHostService {
         return responses;
     }
 
+    public AccommodationResponse update(Long accommodationId, AccommodationRequest.Update request) {
+        Accommodation accommodation = getAccommodationByAccommodationId(accommodationId);
+
+        accommodation.updateDetails(
+                request.title(),
+                request.sido(),
+                request.sigungu(),
+                request.eupmyeondong(),
+                request.detail(),
+                request.longitude(),
+                request.latitude(),
+                request.description(),
+                request.price(),
+                request.accommodationType(),
+                request.guests());
+
+        return new AccommodationResponse.Update(accommodationId);
+    }
+
+
     public AccommodationResponse delete(Long accommodationId) {
         accommodationRepository.delete(getAccommodationByAccommodationId(accommodationId));
         return new AccommodationResponse.Delete(accommodationId);
@@ -63,6 +83,7 @@ public class AccommodationHostService {
                 .orElseThrow(() -> new AccommodationCustomException(AccommodationErrorCode.NOT_FOUND_ACCOMMODATION));
     }
 
+
     private List<Accommodation> getAccommodationByHostId(Long hostId) {
         return accommodationRepository.findByHostId(hostId);
     }
@@ -72,7 +93,17 @@ public class AccommodationHostService {
         return new Address(accommodation.getAddress().getLatitude(), accommodation.getAddress().getLatitude());
     }
 
-    public AccommodationResponse update(Long accommodationId, AccommodationRequest.Update request) {
-        return accommodationService.update(accommodationId, request);
-    }
+    //TODO 분리 예정
+//    public AccommodationResponse updateAccommodationAvailableDate(Long accommodationId,
+//                                                                  AccommodationRequest.UpdateAvailableDate request) {
+//        Accommodation accommodation = findById(accommodationId);
+//
+//        AvailableDate availableDate = availableDateService.updateAvailableDate(request.availableDateId(),
+//                request.startDate(), request.endDate(), AvailableDateStatus.AVAILABLE);
+//
+//        accommodation.updateAvailableDate(availableDate);
+//
+//        return new AccommodationResponse.Update(accommodationId);
+//    }
+
 }

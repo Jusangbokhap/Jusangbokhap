@@ -45,7 +45,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		ChatMessage chatMessage = ChatMessage.toEntity(chatMessageRequest);
 
 		log.info("Received from {} to {}: {}", chatMessage.getSenderId(), chatMessage.getReceiverId(),
-			chatMessage.getMessage());
+				chatMessage.getMessage());
 
 		ChatMessage savedMessage = chatMessageRepository.save(chatMessage);
 

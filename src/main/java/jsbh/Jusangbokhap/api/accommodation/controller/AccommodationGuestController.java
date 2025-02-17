@@ -2,10 +2,13 @@ package jsbh.Jusangbokhap.api.accommodation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import java.io.IOException;
 import java.util.List;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
 import jsbh.Jusangbokhap.api.accommodation.service.AccommodationGuestService;
+import jsbh.Jusangbokhap.api.search.service.SearchKeywordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AccommodationGuestController {
     private final AccommodationGuestService accommodationGuestService;
+    private final SearchKeywordService keywordService;
 
     @Operation(
             summary = "숙소 검색 API",
@@ -30,7 +34,8 @@ public class AccommodationGuestController {
             }
     )
     @GetMapping
-    public List<AccommodationResponse> search(@ParameterObject @ModelAttribute AccommodationRequest.Search search) {
+    public List<AccommodationResponse> search(@ParameterObject @ModelAttribute AccommodationRequest.Search search) throws IOException {
+        keywordService.saveKeyword(search);
         return accommodationGuestService.find(search);
     }
 

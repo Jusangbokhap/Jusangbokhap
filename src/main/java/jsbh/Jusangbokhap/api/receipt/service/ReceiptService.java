@@ -39,7 +39,7 @@ public class ReceiptService {
         KakaoPayOrderResponseDto.AmountDto amountDto = responseDto.getAmount();
 
         long totalAmount = amountDto.getTotalAmount();
-        long cancelAmount = amountDto.getTotalAmount() - amountDto.getTaxFreeAmount(); // ✅ 취소 금액 추가
+        long cancelAmount = amountDto.getTotalAmount() - amountDto.getTaxFreeAmount();
         long taxFree = amountDto.getTaxFreeAmount();
         long vat = amountDto.getVatAmount();
         long discount = amountDto.getDiscountAmount();
@@ -54,7 +54,7 @@ public class ReceiptService {
         } else if ("CANCELED".equals(responseDto.getStatus())) {
             payment.updatePaymentOnFailure();
             receiptStatus = ReceiptStatus.CANCELED;
-            adjustRevenueAfterCancellation(payment.getReservation().getAccommodation().getAccommodationId(), cancelAmount); // ✅ 취소된 금액 반영
+            adjustRevenueAfterCancellation(payment.getReservation().getAccommodation().getAccommodationId(), cancelAmount);
         } else {
             log.warn("❌ 결제 실패로 인해 영수증을 발급하지 않습니다. tid={}", responseDto.getTid());
             payment.updatePaymentOnFailure();
