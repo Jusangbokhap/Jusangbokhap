@@ -1,17 +1,13 @@
 package jsbh.Jusangbokhap.common.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor
 @Getter
 public enum ErrorCode {
 
     // 사용자 관련 오류
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다."),
-
-    // 예약 관련 오류
     NOT_FOUND_RESERVATION(HttpStatus.NOT_FOUND, "예약 정보를 찾을 수 없습니다."),
     RESERVATION_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 예약입니다."),
 
@@ -28,4 +24,9 @@ public enum ErrorCode {
 
     private final HttpStatus status;
     private final String message;
+
+    ErrorCode(HttpStatus status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 }
