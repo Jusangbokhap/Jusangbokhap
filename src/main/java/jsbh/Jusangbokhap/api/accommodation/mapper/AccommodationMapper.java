@@ -13,31 +13,10 @@ import jsbh.Jusangbokhap.domain.accommodation.AccommodationType;
 import jsbh.Jusangbokhap.domain.accommodation.AccommodationCapacity;
 
 public class AccommodationMapper {
-    public static Accommodation toEntity(Create dto) {
-        return Accommodation.builder()
-                .address(dto.address())
-                .accommodationPrice(new AccommodationPrice(dto.price()))
-                .accommodationType(AccommodationType.from(dto.accommodationType()))
-                .description(dto.description())
-                .maxGuests(new AccommodationCapacity(dto.personnel()))
-                .availableDates(new ArrayList<>())
-                .imageUrl(null) // TODO: 이미지 저장 기능 추가 후 수정
-                .host(null) // TODO: User Service 개발 후 수정
-                .build();
-    }
-
-    public static Read toResponse(Accommodation accommodation) {
-        return new Read(
-                accommodation.getAddress(),
-
     public static Accommodation toEntity(Create request) {
-
         return Accommodation.builder()
-
                 .title(request.title())
-
                 .businessName(request.businessName())
-
                 .address(AccommodationAddress.builder()
                         .sido(request.sido())
                         .sigungu(request.sigungu())
@@ -46,21 +25,13 @@ public class AccommodationMapper {
                         .longitude(request.longitude())
                         .latitude(request.latitude())
                         .build())
-
                 .accommodationPrice(AccommodationPrice.from(request.price()))
-
                 .accommodationType(AccommodationType.from(request.accommodationType()))
-
                 .maxGuests(AccommodationCapacity.from(request.guests()))
-
                 .description(request.description())
-
                 .availableDates(new ArrayList<>())
-
                 .imageUrl(null) // TODO: 이미지 저장 기능 추가 후 수정
-
                 .host(null) // TODO: User Service 개발 후 수정
-
                 .build();
     }
 
@@ -77,9 +48,7 @@ public class AccommodationMapper {
                 accommodation.getAccommodationType().name(),
                 accommodation.getMaxGuests().getMaxGuest(),
                 1L,
-          
                 accommodation.getAvailableDates()
-                        .getDates()
                         .stream()
                         .map(AvailableDateMapper::toResponse)
                         .collect(Collectors.toList())
