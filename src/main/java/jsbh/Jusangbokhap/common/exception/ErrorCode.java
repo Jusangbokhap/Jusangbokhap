@@ -23,8 +23,10 @@ public enum ErrorCode {
     PAYMENT_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 결제입니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     INVALID_AMOUNT(HttpStatus.BAD_REQUEST, "유효하지 않은 금액입니다."),
-    TID_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보를 찾을 수 없습니다. TID 또는 주문번호를 확인하세요.");
+    TID_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보를 찾을 수 없습니다. TID 또는 주문번호를 확인하세요."),
 
+    // 실시간 검색어 관련 오류
+    NOT_EXIST_KEYWORD(HttpStatus.BAD_REQUEST, "상호명, 시도, 시군구, 읍면동 중 한 가지는 반드시 입력해야 합니다.");
 
     private final HttpStatus status;
     private final String message;
