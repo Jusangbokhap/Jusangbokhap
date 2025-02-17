@@ -22,8 +22,7 @@ kakao:
 
 elasticsearch:
   custom:
-    host: ${ELASTICSEARCH_HOST}
-    port: ${ELASTICSEARCH_PORT}
+    uris: http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
     username: ${ELASTICSEARCH_USERNAME}
     password: ${ELASTICSEARCH_PASSWORD}
     certificate: ${ELASTICSEARCH_CERTIFICATE}
