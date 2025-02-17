@@ -32,9 +32,10 @@ spring:
     driver-class-name: org.postgresql.Driver
   data:
     mongodb:
-      host: localhost
-      port: 27017
-      database: jusangbokhap
+      uri: mongodb://root:root@localhost:27017/chatdb?authSource=admin
+      username: root
+      password: root
+      auto-index-creation: true
     redis:
       host: localhost
       port: 6379
@@ -48,7 +49,7 @@ management:
       show-details: always
     prometheus:
       enabled: true
-      
+
 ---
 spring:
   config:
