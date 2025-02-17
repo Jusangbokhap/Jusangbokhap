@@ -122,4 +122,5 @@ public class Accommodation extends BaseEntity {
     public void updateAvailableDate(AvailableDate updatedDate) {
         getAvailableDates().update(updatedDate);
     }
+
 }
