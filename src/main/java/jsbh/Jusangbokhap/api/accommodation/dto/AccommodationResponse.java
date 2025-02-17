@@ -6,7 +6,8 @@ import jsbh.Jusangbokhap.api.availableDate.dto.AvailableDateResponse;
 public interface AccommodationResponse {
     record Create(
             Long accommodationId
-    ) implements AccommodationResponse {}
+    ) implements AccommodationResponse {
+    }
 
     record Read(
             String businessName,
@@ -20,11 +21,13 @@ public interface AccommodationResponse {
             Integer guests,
             Long userId,
             List<AvailableDateResponse> availableDates
-    ) implements AccommodationResponse {}
+    ) implements AccommodationResponse {
+    }
 
     record Update(
             Long accommodationId
-    ) implements AccommodationResponse {}
+    ) implements AccommodationResponse {
+    }
 
     record Delete(
             Long accommodationId
@@ -37,15 +40,18 @@ public interface AccommodationResponse {
             String address,
             Integer AccommodationPrice,
             Long totalPrice
-    ) implements AccommodationResponse {}
+    ) implements AccommodationResponse {
+    }
 
     record Address(
             Double x,
             Double y
-    ) implements AccommodationResponse {}
+    )implements AccommodationResponse{
+    }
 
     record Facil(
             String name,
             Integer counter
-    ) implements AccommodationResponse {}
+    )implements AccommodationResponse{
+    }
 }
