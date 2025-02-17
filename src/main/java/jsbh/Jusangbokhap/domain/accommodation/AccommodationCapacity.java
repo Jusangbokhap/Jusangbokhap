@@ -1,5 +1,7 @@
 package jsbh.Jusangbokhap.domain.accommodation;
 
+import static jsbh.Jusangbokhap.api.accommodation.exception.AccommodationErrorCode.INVALID_GUEST_COUNT;
+
 import jakarta.persistence.Embeddable;
 import jsbh.Jusangbokhap.api.accommodation.exception.AccommodationCustomException;
 import lombok.Getter;
@@ -14,6 +16,7 @@ public class AccommodationCapacity {
     public static final Integer MAX_PERSON = 100;
 
     private Integer maxGuest;
+
     public static AccommodationCapacity from(Integer guests) {
         return new AccommodationCapacity(guests);
     }
@@ -24,6 +27,11 @@ public class AccommodationCapacity {
         }
         validateGuest(guests);
         this.maxGuest = guests;
+    }
+
+    private AccommodationCapacity(int guest) {
+        validateGuest(guest);
+        this.maxGuest = guest;
     }
 
     private void validateGuest(int guest) {
