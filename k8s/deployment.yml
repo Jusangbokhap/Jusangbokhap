@@ -37,6 +37,26 @@ spec:
               value: "prod"
             - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
               value: "health,prometheus,metrics"
+            - name: ELASTICSEARCH_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-config
+                  key: host
+            - name: ELASTICSEARCH_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-config
+                  key: port
+            - name: ELASTICSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-config
+                  key: username
+            - name: ELASTICSEARCH_CERTIFICATE
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-cert
+                  key: certificate
           resources:
             requests:
               memory: "512Mi"
