@@ -32,7 +32,7 @@ public enum FacilityCategory {
 
     public static FacilityCategory fromString(String text) {
         return Arrays.stream(FacilityCategory.values())
-                .filter(category -> category.name().equalsIgnoreCase(text))
+                .filter(category -> category.getDescription().equalsIgnoreCase(text))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 카테고리 코드: " + text));
     }
