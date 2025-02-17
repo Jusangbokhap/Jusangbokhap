@@ -5,9 +5,11 @@ import co.elastic.clients.elasticsearch._types.aggregations.StringTermsAggregate
 import co.elastic.clients.elasticsearch._types.aggregations.StringTermsBucket;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
-import jsbh.Jusangbokhap.api.search.dto.request.SearchKeywordRequest;
+import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.search.dto.response.SearchKeywordResponse;
 import jsbh.Jusangbokhap.api.search.dto.response.SearchKeywordRankResponse;
+import jsbh.Jusangbokhap.common.exception.CustomException;
+import jsbh.Jusangbokhap.common.exception.ErrorCode;
 import jsbh.Jusangbokhap.domain.search.document.KeywordDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,10 +32,14 @@ public class SearchKeywordService {
     private static final int SEARCH_LIMIT = 10;
 
     // 검색 시, 키워드 저장
-    public SearchKeywordResponse saveKeyword(SearchKeywordRequest keywordRequest) throws IOException {
+    public SearchKeywordResponse saveKeyword(AccommodationRequest.Search search) throws IOException {
 
-        // will add try-catch exception
-        KeywordDocument keywordDocument = new KeywordDocument(keywordRequest.getKeyword());
+        String keyword = getKeyword(search);
+        if (keyword == null) {
+            throw new CustomException(ErrorCode.NOT_EXIST_KEYWORD);
+        }
+
+        KeywordDocument keywordDocument = new KeywordDocument(keyword);
 
         IndexResponse response = esClient.index(i -> i
                 .index(SEARCH_INDEX_NAME)
@@ -69,6 +75,33 @@ public class SearchKeywordService {
         }
 
         return rankList;
+    }
+
+    // 상호명, 읍면동, 시군구, 시도 순서로 키워드를 가져온다.
+    private String getKeyword(AccommodationRequest.Search search) {
+
+        String businessName = search.businessName(); // 상호명
+        String eupmyeondong = search.eupmyeondong();// 읍면동
+        String sigungu = search.sigungu();// 시군구
+        String sido = search.sido();// 시도
+
+        if (businessName != null && !businessName.trim().isEmpty()) {
+            return businessName;
+        }
+
+        if (eupmyeondong != null && !eupmyeondong.trim().isEmpty()) {
+            return eupmyeondong;
+        }
+
+        if (sigungu != null && !sigungu.trim().isEmpty()) {
+            return sigungu;
+        }
+
+        if (sido != null && !sido.trim().isEmpty()) {
+            return sido;
+        }
+
+        return null;
     }
 
 
