@@ -93,7 +93,7 @@ public class AccommodationHostService {
         return new Address(accommodation.getAddress().getLatitude(), accommodation.getAddress().getLatitude());
     }
 
-        //TODO 분리 예정
+    //TODO 분리 예정
 //    public AccommodationResponse updateAccommodationAvailableDate(Long accommodationId,
 //                                                                  AccommodationRequest.UpdateAvailableDate request) {
 //        Accommodation accommodation = findById(accommodationId);
