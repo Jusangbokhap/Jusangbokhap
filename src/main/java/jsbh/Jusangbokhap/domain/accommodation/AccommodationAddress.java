@@ -70,6 +70,4 @@ public class AccommodationAddress {
             this.latitude = latitude;
         }
     }
-
-
 }
