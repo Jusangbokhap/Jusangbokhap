@@ -21,7 +21,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		registry.addHandler(chatWebSocketHandler, WEBSOCKET_PATH)
-			.setAllowedOrigins("*"); // CORS 문제 해결 (실제 배포 시 특정 도메인 설정 필요)
+				.setAllowedOrigins("*"); // CORS 문제 해결 (실제 배포 시 특정 도메인 설정 필요)
 	}
 }
-
