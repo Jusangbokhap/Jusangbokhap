@@ -42,9 +42,6 @@ public class Accommodation extends BaseEntity {
     private String title;
 
     @Column(nullable = false)
-    private String address;
-
-    @Column(nullable = false)
     private String businessName;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -67,7 +64,6 @@ public class Accommodation extends BaseEntity {
     @Column
     private String imageUrl;
 
-    //TODO User Service 개발 완료 시 nullable = false 변경
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id", nullable = true)
     private User host;
@@ -81,17 +77,17 @@ public class Accommodation extends BaseEntity {
     private List<AvailableDate> availableDates = new ArrayList<>();
 
     public void updateDetails(
-                            String title,
-                            String sido,
-                            String sigungu,
-                            String eupmyeondong,
-                            String detail,
-                            Double longitude,
-                            Double latitude,
-                            String description,
-                            Integer price,
-                            String accommodationType,
-                            Integer guests) {
+            String title,
+            String sido,
+            String sigungu,
+            String eupmyeondong,
+            String detail,
+            Double longitude,
+            Double latitude,
+            String description,
+            Integer price,
+            String accommodationType,
+            Integer guests) {
 
         if (title != null && !title.isEmpty()) {
             this.title = title;
@@ -121,5 +117,4 @@ public class Accommodation extends BaseEntity {
     public void updateAvailableDate(AvailableDate updatedDate) {
         getAvailableDates().update(updatedDate);
     }
-
 }
