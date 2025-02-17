@@ -55,6 +55,11 @@ public class AvailableDates {
 
     public void validateDateOverlap(AvailableDate newDate) {
         for (AvailableDate existingDate : availableDates) {
+
+            if (existingDate.getId() == null) {
+                continue;
+            }
+          
             if (existingDate.getId().equals(newDate.getId())) {
                 continue;
             }

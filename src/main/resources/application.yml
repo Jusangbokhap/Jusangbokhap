@@ -30,6 +30,26 @@ springdoc:
   profiles:
     active: prod
 
+kakao:
+  api:
+    key: ${KAKAO_API_KEY}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,metrics,info
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
 ---
 spring:
   config:
@@ -40,9 +60,25 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/chatdb?authSource=admin
+      username: root
+      password: root
+      auto-index-creation: true
+    redis:
+      host: localhost
+      port: 6379
   jpa:
     hibernate:
       ddl-auto: update
+
+management:
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
 
 ---
 spring:
@@ -54,6 +90,14 @@ spring:
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
+  data:
+    mongodb:
+      database: jusangbokhap_test
+      host: localhost
+      port: 27017
+    redis:
+      port: 6379
+      host: localhost
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -65,18 +109,48 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${POSTGRES_URL}:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     hikari:
       driver-class-name: org.postgresql.Driver
       maximum-pool-size: 5
       minimum-idle: 1
       idle-timeout: 300000
+  data:
+    mongodb:
+      uri: mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0.5ly7k.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority&appName=Cluster0
+    redis:
+      host: redis
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  cache:
+    type: redis
+    redis:
+      time-to-live: 1800000
+      enable-statistics: true
+  session:
+    store-type: redis
+    redis:
+      namespace: spring:session
+      flush-mode: on_save
+    timeout: 1800
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
+management:
+  endpoint:
+    health:
+      show-details: when_authorized
+    prometheus:
+      enabled: true
 
 server:
   port: 8080

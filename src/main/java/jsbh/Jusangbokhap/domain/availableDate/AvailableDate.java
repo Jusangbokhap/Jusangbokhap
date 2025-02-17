@@ -9,8 +9,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
 import jakarta.persistence.Version;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 import jsbh.Jusangbokhap.api.availableDate.exception.AvailableDateCustomException;
 import jsbh.Jusangbokhap.api.availableDate.exception.AvailableDateErrorCode;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
@@ -33,31 +36,31 @@ public class AvailableDate {
     private Accommodation accommodation;
 
     @Column(nullable = false)
-    private LocalDate startDate;
+    private LocalDate checkin;
 
     @Column(nullable = false)
-    private LocalDate endDate;
+    private LocalDate checkout;
 
     @Enumerated(EnumType.STRING)
     private AvailableDateStatus status;
 
     @Version
     private Long version;
-
+  
     protected void setAccommodation(Accommodation accommodation) {
         this.accommodation = accommodation;
     }
 
     @Builder
-    public AvailableDate(LocalDate startDate, LocalDate endDate, AvailableDateStatus status) {
-        validateDateRange(startDate, endDate);
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public AvailableDate(LocalDate checkin, LocalDate checkout, AvailableDateStatus status) {
+        validateDateRange(checkin, checkout);
+        this.checkin = checkin;
+        this.checkout = checkout;
         this.status = status;
     }
 
     public AvailableDate matchDates(LocalDate checkin, LocalDate checkout) {
-        if (this.startDate.equals(checkin) && this.endDate.equals(checkout)) {
+        if (this.checkin.equals(checkin) && this.checkout.equals(checkout)) {
             return this;
         }
         return null;
@@ -73,8 +76,8 @@ public class AvailableDate {
 
     public void updateDate(LocalDate startDate, LocalDate endDate, AvailableDateStatus status) {
         validateDateRange(startDate, endDate);
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.checkin = startDate;
+        this.checkout = endDate;
         this.status = status;
     }
 
@@ -95,13 +98,13 @@ public class AvailableDate {
     }
 
     public boolean isOverlappingWith(AvailableDate newDate) {
-        return (newDate.getStartDate().isBefore(this.getEndDate()) &&
-                newDate.getEndDate().isAfter(this.getStartDate())) ||
+        return (newDate.getCheckin().isBefore(this.getCheckout()) &&
+                newDate.getCheckout().isAfter(this.getCheckin())) ||
 
-                (newDate.getStartDate().equals(this.getStartDate()) ||
-                        newDate.getEndDate().equals(this.getEndDate())) ||
+                (newDate.getCheckin().equals(this.getCheckin()) ||
+                        newDate.getCheckout().equals(this.getCheckout())) ||
 
-                (newDate.getStartDate().isBefore(this.getStartDate()) &&
-                        newDate.getEndDate().isAfter(this.getEndDate()));
+                (newDate.getCheckin().isBefore(this.getCheckin()) &&
+                        newDate.getCheckout().isAfter(this.getCheckout()));
     }
 }
