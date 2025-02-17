@@ -31,6 +31,6 @@ data:
   SPRING_SESSION_REDIS_FLUSH_MODE: "on_save"
   SPRING_SESSION_REDIS_NAMESPACE: "spring:session"
 
-  ELASTICSEARCH_HOST: "jusangbokhap-es-es-http.elasitcsearch.svc.cluster.local"
-  ELASTICSEARCH_PORT: "9200"
-  SPRING_ELASTICSEARCH_URIS: "http://jusangbokhap-es-es-http.elasticsearch.svc.cluster.local:9200"
+  elasticsearch.custom.host: "jusangbokhap-es-es-http.elasticsearch.svc.cluster.local"
+  elasticsearch.custom.port: "9200"
+  elasticsearch.custom.uris: "http://jusangbokhap-es-es-http.elasticsearch.svc.cluster.local:9200"
