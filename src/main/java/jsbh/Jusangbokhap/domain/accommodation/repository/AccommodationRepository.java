@@ -32,10 +32,6 @@ public class AccommodationRepository {
         return Optional.ofNullable(em.find(Accommodation.class, accommodationId));
     }
 
-    public void delete(Accommodation accommodation) {
-        em.remove(accommodation);
-    }
-
     public List<Accommodation> findByHostId(Long hostId) {
         return em.createQuery("SELECT ac FROM Accommodation ac WHERE ac.host.id = :hostId", Accommodation.class)
                 .setParameter("hostId", hostId)
@@ -55,5 +51,4 @@ public class AccommodationRepository {
                 .where(availableDate.status.eq(AvailableDateStatus.AVAILABLE), predicate)
                 .fetch();
     }
-
 }
