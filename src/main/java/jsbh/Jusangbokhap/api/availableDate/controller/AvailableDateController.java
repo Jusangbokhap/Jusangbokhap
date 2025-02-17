@@ -1,6 +1,7 @@
 package jsbh.Jusangbokhap.api.availableDate.controller;
 
 import jsbh.Jusangbokhap.api.accommodation.service.AccommodationService;
+import jsbh.Jusangbokhap.api.accommodation.service.AccommodationHostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AvailableDateController {
 
     private final AccommodationService accommodationService;
+    private final AccommodationHostService accommodationHostService;
 
 //
 //    //TODO 분리 예쩡
