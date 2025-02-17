@@ -112,6 +112,9 @@ jobs:
 
       - name: Deploy to EKS
         run: |
+          kubectl delete secret elasticsearch-config
+          kubectl delete secret elasticsearch-cert --ignore-not-found
+          
           kubectl get secret elasticsearch-config -n elasticsearch -o yaml | sed 's/namespace: elasticsearch/namespace: default/' | kubectl apply -f -
           kubectl get secret elasticsearch-cert -n elasticsearch -o yaml | sed 's/namespace: elasticsearch/namespace: default/' | kubectl apply -f -
           
