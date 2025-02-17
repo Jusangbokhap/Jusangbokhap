@@ -20,7 +20,7 @@ jobs:
         image: mongo:latest
         ports: [ '27017:27017' ]
       postgres:
-        image: postgres:15
+        image: postgres:17
         ports: [ '5432:5432' ]
         env:
           POSTGRES_DB: jusangbokhap
