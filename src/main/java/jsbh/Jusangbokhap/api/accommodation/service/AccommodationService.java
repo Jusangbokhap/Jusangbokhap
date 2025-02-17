@@ -44,11 +44,17 @@ public class AccommodationService {
         Accommodation accommodation = findById(accommodationId);
 
         accommodation.updateDetails(
-                request.address(),
+                request.title(),
+                request.sido(),
+                request.sigungu(),
+                request.eupmyeondong(),
+                request.detail(),
+                request.longitude(),
+                request.latitude(),
                 request.description(),
                 request.price(),
                 request.accommodationType(),
-                request.personnel());
+                request.guests());
 
         return new AccommodationResponse.Update(accommodationId);
     }
@@ -59,13 +65,13 @@ public class AccommodationService {
         return new AccommodationResponse.Delete(accommodationId);
     }
 
-    private Accommodation findById(Long accommodationId) {
+    public Accommodation findById(Long accommodationId) {
         return accommodationRepository
                 .findByAccommodationId(accommodationId)
                 .orElseThrow(() -> new AccommodationCustomException(AccommodationErrorCode.NOT_FOUND_ACCOMMODATION));
     }
 
-        //TODO 분리 예정
+    //TODO 분리 예정
 //    public AccommodationResponse updateAccommodationAvailableDate(Long accommodationId,
 //                                                                  AccommodationRequest.UpdateAvailableDate request) {
 //        Accommodation accommodation = findById(accommodationId);

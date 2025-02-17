@@ -12,12 +12,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AccommodationCapacity {
 
-    public static final Integer MIN_PERSON = 1;
-    public static final Integer MAX_PERSON = 100;
+    public static final int MIN_PERSON = 1;
+    public static final int MAX_PERSON = 100;
 
     private Integer maxGuest;
 
     public AccommodationCapacity(int guest) {
+        validateGuest(guest);
+        this.maxGuest = guest;
+    }
+
+    public static AccommodationCapacity from(Integer guest) {
+        return new AccommodationCapacity(guest);
+    }
+
+    public void updateMaxGuests(Integer guest) {
+        if (guest == null) {
+            throw new AccommodationCustomException(INVALID_GUEST_COUNT);
+        }
         validateGuest(guest);
         this.maxGuest = guest;
     }

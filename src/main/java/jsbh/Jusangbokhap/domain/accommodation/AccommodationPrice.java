@@ -1,6 +1,5 @@
 package jsbh.Jusangbokhap.domain.accommodation;
 
-
 import jakarta.persistence.Embeddable;
 import jsbh.Jusangbokhap.api.accommodation.exception.AccommodationCustomException;
 import jsbh.Jusangbokhap.api.accommodation.exception.AccommodationErrorCode;
@@ -18,6 +17,18 @@ public class AccommodationPrice {
     private Integer price;
 
     public AccommodationPrice(Integer price) {
+        validateAccommodationPrice(price);
+        this.price = price;
+    }
+
+    public static AccommodationPrice from(Integer price) {
+        return new AccommodationPrice(price);
+    }
+
+    public void updatePrice(Integer price) {
+        if (price == null) {
+            throw new AccommodationCustomException(AccommodationErrorCode.INVALID_ACCOMMODATION_PRICE);
+        }
         validateAccommodationPrice(price);
         this.price = price;
     }

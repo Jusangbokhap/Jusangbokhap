@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import jsbh.Jusangbokhap.common.exception.CustomException;
 import jsbh.Jusangbokhap.common.exception.ErrorCode;
 import jsbh.Jusangbokhap.domain.BaseEntity;
+//import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.user.User;
 import lombok.*;
