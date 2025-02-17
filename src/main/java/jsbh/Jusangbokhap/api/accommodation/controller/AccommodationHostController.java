@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/accommodations")
+@RequestMapping("/api/host/accommodations")
 @RequiredArgsConstructor
 public class AccommodationHostController {
 
