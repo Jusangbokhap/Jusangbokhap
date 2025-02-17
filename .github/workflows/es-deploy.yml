@@ -41,14 +41,14 @@ jobs:
 
       - name: Create Elasticsearch Secrets
         run: |
-          echo "${{ secrets.ELASTICSEARCH_CERTIFICATE }}" | base64 -d > cert.pem
+          echo "${{ secrets.ELASTICSEARCH_CERTIFICATE }}" > cert.txt
          
           kubectl create secret generic elasticsearch-cert \
-            --from-literal=certificate=cert.pem \
+            --from-literal=certificate=cert.txt \
             --namespace elasticsearch \
             --dry-run=client -o yaml | kubectl apply -f -
           
-          rm cert.pem
+          rm cert.txt
           
           kubectl create secret generic elasticsearch-config \
             --from-literal=username='${{ secrets.ELASTICSEARCH_USERNAME }}' \
