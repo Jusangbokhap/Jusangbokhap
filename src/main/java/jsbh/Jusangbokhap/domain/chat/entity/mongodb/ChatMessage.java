@@ -15,7 +15,6 @@ import lombok.*;
 @Document(collection = "chat_messages")
 @Getter
 @NoArgsConstructor
-@Builder
 public class ChatMessage {
 
 	@Id
@@ -37,7 +36,7 @@ public class ChatMessage {
 
 	@Builder
 	public ChatMessage(Long roomId, Long senderId, Long receiverId, String message, Date timestamp,
-		boolean read) {
+					   boolean read) {
 		this.roomId = roomId;
 		this.senderId = senderId;
 		this.receiverId = receiverId;
@@ -48,13 +47,13 @@ public class ChatMessage {
 
 	public static ChatMessage toEntity(ChatMessageRequest dto) {
 		return ChatMessage.builder()
-			.roomId(dto.getRoomId())
-			.senderId(dto.getSenderId())
-			.receiverId(dto.getReceiverId())
-			.message(dto.getMessage())
-			.timestamp(Date.from(Instant.now()))
-			.read(false)
-			.build();
+				.roomId(dto.getRoomId())
+				.senderId(dto.getSenderId())
+				.receiverId(dto.getReceiverId())
+				.message(dto.getMessage())
+				.timestamp(Date.from(Instant.now()))
+				.read(false)
+				.build();
 	}
 
 	public void updateReadStatus(boolean isRead) {
