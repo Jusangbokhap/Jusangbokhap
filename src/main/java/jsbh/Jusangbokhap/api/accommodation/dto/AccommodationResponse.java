@@ -28,8 +28,8 @@ public interface AccommodationResponse {
 
     record Delete(
             Long accommodationId
-    ) implements AccommodationResponse {}
-
+    ) implements AccommodationResponse {
+    }
     record Search(
             Long accommodationId,
             String businessName,

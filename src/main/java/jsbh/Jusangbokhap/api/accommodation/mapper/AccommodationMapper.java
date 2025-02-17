@@ -1,5 +1,6 @@
 package jsbh.Jusangbokhap.api.accommodation.mapper;
 
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.stream.Collectors;

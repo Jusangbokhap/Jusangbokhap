@@ -14,12 +14,6 @@ public class AccommodationCapacity {
     public static final Integer MAX_PERSON = 100;
 
     private Integer maxGuest;
-
-    public AccommodationCapacity(int guest) {
-        validateGuest(guest);
-        this.maxGuest = guest;
-    }
-
     public static AccommodationCapacity from(Integer guests) {
         return new AccommodationCapacity(guests);
     }

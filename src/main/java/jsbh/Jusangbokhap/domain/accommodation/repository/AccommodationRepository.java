@@ -55,4 +55,5 @@ public class AccommodationRepository {
                 .where(availableDate.status.eq(AvailableDateStatus.AVAILABLE), predicate)
                 .fetch();
     }
+
 }
