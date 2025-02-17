@@ -57,6 +57,11 @@ spec:
                 secretKeyRef:
                   name: elasticsearch-cert
                   key: certificate
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-config
+                  key: password
           resources:
             requests:
               memory: "512Mi"
