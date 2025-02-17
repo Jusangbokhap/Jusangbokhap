@@ -13,6 +13,8 @@ public interface AccommodationResponse {
             String businessName,
             String title,
             String address,
+            Double x,
+            Double y,
             String description,
             Integer price,
             String accommodationType,
@@ -31,7 +33,6 @@ public interface AccommodationResponse {
             Long accommodationId
     ) implements AccommodationResponse {
     }
-
     record Search(
             Long accommodationId,
             String businessName,
@@ -40,5 +41,17 @@ public interface AccommodationResponse {
             Integer AccommodationPrice,
             Long totalPrice
     ) implements AccommodationResponse {
+    }
+
+    record Address(
+            Double x,
+            Double y
+    )implements AccommodationResponse{
+    }
+
+    record Facil(
+            String name,
+            Integer counter
+    )implements AccommodationResponse{
     }
 }

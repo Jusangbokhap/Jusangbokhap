@@ -1,5 +1,6 @@
 package jsbh.Jusangbokhap.api.accommodation.mapper;
 
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -54,6 +55,8 @@ public class AccommodationMapper {
                 accommodation.getBusinessName(),
                 accommodation.getTitle(),
                 accommodation.getAddress().getFullAddress(),
+                accommodation.getAddress().getLongitude(),
+                accommodation.getAddress().getLatitude(),
                 accommodation.getDescription(),
                 accommodation.getAccommodationPrice().getPrice(),
                 accommodation.getAccommodationType().name(),

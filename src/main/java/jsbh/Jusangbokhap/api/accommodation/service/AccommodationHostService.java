@@ -6,6 +6,7 @@ import java.util.List;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest.Create;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
+import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse.Address;
 import jsbh.Jusangbokhap.api.accommodation.exception.AccommodationCustomException;
 import jsbh.Jusangbokhap.api.accommodation.exception.AccommodationErrorCode;
 import jsbh.Jusangbokhap.api.accommodation.mapper.AccommodationMapper;
@@ -85,6 +86,11 @@ public class AccommodationHostService {
 
     private List<Accommodation> getAccommodationByHostId(Long hostId) {
         return accommodationRepository.findByHostId(hostId);
+    }
+
+    public AccommodationResponse.Address getAccommodationAddressById(Long accommodationId) {
+        Accommodation accommodation = getAccommodationByAccommodationId(accommodationId);
+        return new Address(accommodation.getAddress().getLatitude(), accommodation.getAddress().getLatitude());
     }
 
         //TODO 분리 예정

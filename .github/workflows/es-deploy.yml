@@ -1,0 +1,98 @@
+name: Deploy Elasticsearch
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'k8s/elasticsearch/**'
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  EKS_CLUSTER_NAME: community-cluster
+
+jobs:
+  deploy-elasticsearch:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+
+      - name: Create Elasticsearch namespace
+        run: |
+          kubectl create namespace elasticsearch --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Install ECK Operator
+        run: |
+          kubectl create namespace elastic-system --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create -f https://download.elastic.co/downloads/eck/2.11.1/crds.yaml --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f https://download.elastic.co/downloads/eck/2.11.1/operator.yaml
+
+      - name: Create Elasticsearch Secrets
+        run: |
+          kubectl create secret generic elasticsearch-cert \
+            --from-literal=certificate='${{ secrets.ELASTICSEARCH_CERTIFICATE }}' \
+            --namespace elasticsearch \
+            --dry-run=client -o yaml | kubectl apply -f -
+          
+          kubectl create secret generic elasticsearch-config \
+            --from-literal=username='${{ secrets.ELASTICSEARCH_USERNAME }}' \
+            --from-literal=host='${{ secrets.ELASTICSEARCH_HOST }}' \
+            --from-literal=port='${{ secrets.ELASTICSEARCH_PORT }}' \
+            --namespace elasticsearch \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy Elasticsearch
+        run: |
+          kubectl apply -f k8s/elasticsearch/ -n elasticsearch
+
+      - name: Get Elasticsearch Status
+        run: |
+          echo "Checking Elasticsearch cluster status..."
+          kubectl get elasticsearch
+          echo "Checking Elasticsearch pods status..."
+          kubectl get pods -l elasticsearch.k8s.elastic.co/cluster-name=jusangbokhap-es
+
+      - name: Get Elasticsearch Password
+        id: get-password
+        run: |
+          PASSWORD=$(kubectl get secret jusangbokhap-es-es-elastic-user -n elasticsearch -o go-template='{{.data.elastic | base64decode}}')
+          echo "ES_PASSWORD=$PASSWORD" >> $GITHUB_ENV
+
+      - name: Store ES Password in GitHub Secret
+        if: success()
+        uses: gliech/create-github-secret-action@v1
+        with:
+          name: ES_PASSWORD
+          value: ${{ env.ES_PASSWORD }}
+          pa_token: ${{ secrets.GH_PA_TOKEN }}
+
+      - name: Verify Elasticsearch Connection
+        run: |
+          POD_NAME=$(kubectl get pods -n elasticsearch -l elasticsearch.k8s.elastic.co/cluster-name=jusangbokhap-es -o jsonpath='{.items[0].metadata.name}')
+          kubectl exec $POD_NAME -n elasticsearch -- curl -u "elastic:${ES_PASSWORD}" -k https://localhost:9200/_cluster/health
+
+      - name: Get Elasticsearch logs if failed
+        if: failure()
+        run: |
+          echo "Collecting Elasticsearch logs due to failure..."
+          kubectl logs -l elasticsearch.k8s.elastic.co/cluster-name=jusangbokhap-es
+          echo "Collecting Operator logs..."
+          kubectl logs -n elastic-system -l control-plane=elastic-operator
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "Deployment failed. Check the logs above for more details"
+          

@@ -5,6 +5,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
@@ -38,8 +39,7 @@ public class AccommodationGuestService {
                     accommodation.getTitle(),
                     accommodation.getAddress().getFullAddress(),
                     accommodation.getAccommodationPrice().getPrice(),
-                    accommodation.getAvailableDates()
-                            .calculateTotalPrice(accommodation.getAccommodationPrice().getPrice())
+                    ChronoUnit.DAYS.between(filter.checkin(), filter.checkout()) * accommodation.getAccommodationPrice().getPrice()
             );
             responses.add(search);
         }
@@ -76,8 +76,8 @@ public class AccommodationGuestService {
 
     private BooleanBuilder filterByDate(BooleanBuilder builder, LocalDate checkin, LocalDate checkout) {
         if (checkin != null && checkout != null) {
-            builder.and(QAccommodation.accommodation.availableDates.any().checkin.goe(checkin));
-            builder.and(QAccommodation.accommodation.availableDates.any().checkout.loe(checkout));
+            builder.and(QAccommodation.accommodation.availableDates.any().checkin.loe(checkin));
+            builder.and(QAccommodation.accommodation.availableDates.any().checkout.goe(checkout));
         }
         return builder;
     }

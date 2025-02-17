@@ -1,5 +1,6 @@
 package jsbh.Jusangbokhap.domain.availableDate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,10 +20,14 @@ public class AvailableDates {
         this.availableDates = new ArrayList<>();
     }
 
-    public Long calculateTotalPrice(int price) {
-        return availableDates
-                .get(0)
-                .getDateDifference() * price;
+    public AvailableDate findReservableDate(LocalDate checkin, LocalDate checkout) {
+        for (AvailableDate availableDate : availableDates) {
+            AvailableDate reservation = availableDate.matchDates(checkin, checkout);
+            if (reservation != null) {
+                return reservation;
+            }
+        }
+        return null;
     }
 
     public List<AvailableDate> getDates() {
@@ -30,8 +35,8 @@ public class AvailableDates {
     }
 
     public void add(AvailableDate newDate, Accommodation accommodation) {
-        newDate.setAccommodation(accommodation);
         validateDateOverlap(newDate);
+        newDate.setAccommodation(accommodation);
         availableDates.add(newDate);
     }
 
@@ -54,7 +59,7 @@ public class AvailableDates {
             if (existingDate.getId() == null) {
                 continue;
             }
-
+          
             if (existingDate.getId().equals(newDate.getId())) {
                 continue;
             }

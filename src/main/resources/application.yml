@@ -4,6 +4,56 @@ spring:
   profiles:
     active: prod
 
+logging:
+  file:
+    name: logs/application.log
+  level:
+    root: INFO
+    org.springframework: DEBUG
+
+kakao:
+  api:
+    admin-key: ""
+    cid: "TC0ONETIME"
+    approval-url: "https://frontend.com/payments/approve"
+    cancel-url: "https://frontend.com/payments/cancel"
+    fail-url: "https://frontend.com/payments/fail"
+    key: ${KAKAO_API_KEY}
+
+elasticsearch:
+  custom:
+    host: ${ELASTICSEARCH_HOST}
+    port: ${ELASTICSEARCH_PORT}
+    username: ${ELASTICSEARCH_USERNAME}
+    password: ${ELASTICSEARCH_PASSWORD}
+    certificate: ${ELASTICSEARCH_CERTIFICATE}
+    search:
+      index-name:
+        search-keyword
+      top-index-name:
+        top-keywords
+
+redis:
+  search:
+    rank:
+      search:rank
+    meta:
+      search:meta
+    meta-last-updated:
+      last-updated
+
+search:
+  key:
+    realtime-keywords
+  result_key:
+    realtime-keywords-result
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
 management:
   health:
     elasticsearch:
@@ -15,13 +65,12 @@ management:
   endpoint:
     health:
       show-details: always
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
   metrics:
     tags:
       application: ${spring.application.name}
+
+server:
+  port: 8080
 
 ---
 spring:
@@ -38,6 +87,7 @@ spring:
       host: localhost
       port: 27017
       database: jusangbokhap
+      auto-index-creation: true
     redis:
       host: localhost
       port: 6379
@@ -45,13 +95,6 @@ spring:
     hibernate:
       ddl-auto: update
 
-management:
-  endpoint:
-    health:
-      show-details: always
-    prometheus:
-      enabled: true
-      
 ---
 spring:
   config:
@@ -84,8 +127,8 @@ spring:
     url: jdbc:postgresql://${POSTGRES_URL}:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
     hikari:
-      driver-class-name: org.postgresql.Driver
       maximum-pool-size: 5
       minimum-idle: 1
       idle-timeout: 300000
@@ -108,7 +151,6 @@ spring:
       time-to-live: 1800000
       enable-statistics: true
   session:
-    store-type: redis
     redis:
       namespace: spring:session
       flush-mode: on_save
@@ -119,42 +161,6 @@ spring:
     show-sql: false
 
 management:
-  health:
-    elasticsearch:
-      enabled: false
   endpoint:
     health:
       show-details: when_authorized
-    prometheus:
-      enabled: true
-
-server:
-  port: 8080
-
-elasticsearch:
-  custom:
-    host: ${ELASTICSEARCH_HOST}
-    port: ${ELASTICSEARCH_PORT}
-    username: ${ELASTICSEARCH_USERNAME}
-    password: ${ELASTICSEARCH_PASSWORD}
-    certificate: ${ELASTICSEARCH_CERTIFICATE}
-    search:
-      index-name:
-        search-keyword
-      top-index-name:
-        top-keywords
-
-redis:
-  search:
-    rank:
-      search:rank
-    meta:
-      search:meta
-    meta-last-updated:
-      last-updated
-
-search:
-  key:
-    realtime-keywords
-  result_key:
-    realtime-keywords-result
