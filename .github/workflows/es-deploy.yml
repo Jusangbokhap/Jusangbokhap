@@ -48,7 +48,7 @@ jobs:
           
           kubectl create secret generic elasticsearch-config \
             --from-literal=username='${{ secrets.ELASTICSEARCH_USERNAME }}' \
-            --from-literal=password='${{ secrets.ES_PASSWORD }} \
+            --from-literal=password='${{ secrets.ES_PASSWORD }}' \
             --from-literal=host='${{ secrets.ELASTICSEARCH_HOST }}' \
             --from-literal=port='${{ secrets.ELASTICSEARCH_PORT }}' \
             --namespace elasticsearch \
