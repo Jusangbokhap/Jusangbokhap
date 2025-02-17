@@ -42,6 +42,9 @@ public class Accommodation extends BaseEntity {
     private String title;
 
     @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = false)
     private String businessName;
 
     @OneToOne(cascade = CascadeType.ALL)
