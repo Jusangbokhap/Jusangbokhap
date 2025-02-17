@@ -33,7 +33,6 @@ public interface AccommodationResponse {
             Long accommodationId
     ) implements AccommodationResponse {
     }
-
     record Search(
             Long accommodationId,
             String businessName,

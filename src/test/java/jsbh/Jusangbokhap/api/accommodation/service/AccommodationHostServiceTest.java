@@ -277,7 +277,7 @@ class AccommodationHostServiceTest {
     @DisplayName("숙소 조회 성공: 호스트가 등록된 숙소가 존재")
     void 호스트_숙소_조회_성공() {
         Long userId = 1L;
-        User host = new User(null, null, null);
+        User host = new User(null, null, null, null);
         ReflectionTestUtils.setField(host, "userId", 1L);
 
         Accommodation accommodation = Accommodation.builder()
@@ -319,7 +319,7 @@ class AccommodationHostServiceTest {
     @DisplayName("숙소 조회 실패: 호스트가 등록된 숙소가 존재하지 않음")
     void 호스트_숙소_조회_실패_호스트가_등록한_숙소가_없음() {
         Long userId = 1L;
-        User host = new User(null, null, null);
+        User host = new User(null, null, null, null);
         ReflectionTestUtils.setField(host, "userId", 1L);
 
         List<Accommodation> emptyAccommodations = Collections.emptyList();

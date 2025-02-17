@@ -34,6 +34,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Accommodation extends BaseEntity {
 
+
+    public static final Integer MIN_PERSON = 0;
+    public static final Integer MAX_PERSON = 0;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accommodationId;

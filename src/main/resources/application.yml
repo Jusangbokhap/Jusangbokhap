@@ -1,12 +1,36 @@
 spring:
   application:
     name: Jusangbokhap
-  profiles:
-    active: prod
+
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 60000
+
+logging:
+  file:
+    name: logs/application.log
+  level:
+    root: INFO
+    org.springframework: DEBUG
 
 kakao:
   api:
-    key: ${KAKAO_API_KEY}
+    admin-key: ""
+    cid: "TC0ONETIME"
+    approval-url: "https://frontend.com/payments/approve"
+    cancel-url: "https://frontend.com/payments/cancel"
+    fail-url: "https://frontend.com/payments/fail"
+    key: 572ddcfabe510f2d407223d10c1f97fb
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+  profiles:
+    active: prod
+
 
 management:
   endpoints:

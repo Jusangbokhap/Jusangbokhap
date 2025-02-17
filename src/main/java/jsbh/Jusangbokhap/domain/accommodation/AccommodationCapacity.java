@@ -17,7 +17,6 @@ public class AccommodationCapacity {
 
     private Integer maxGuest;
 
-
     public static AccommodationCapacity from(Integer guests) {
         return new AccommodationCapacity(guests);
     }
