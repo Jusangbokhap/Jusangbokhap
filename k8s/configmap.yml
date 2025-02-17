@@ -30,3 +30,7 @@ data:
   SPRING_SESSION_STORE_TYPE: "redis"
   SPRING_SESSION_REDIS_FLUSH_MODE: "on_save"
   SPRING_SESSION_REDIS_NAMESPACE: "spring:session"
+
+  ELASTICSEARCH_HOST: "jusangbokhap-es-es-http.elasitcsearch.svc.cluster.local"
+  ELASTICSEARCH_PORT: "9200"
+  SPRING_ELASTICSEARCH_URIS: "http://jusangbokhap-es-es-http.elasticsearch.svc.cluster.local:9200"
