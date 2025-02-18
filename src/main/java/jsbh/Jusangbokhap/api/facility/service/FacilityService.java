@@ -15,6 +15,7 @@ import jsbh.Jusangbokhap.domain.facility.FacilityCategory;
 import jsbh.Jusangbokhap.domain.facility.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -86,10 +87,13 @@ public class FacilityService {
 
     private List<Facility> updateFacilitiesForAccommodation(Accommodation accommodation,
                                                             List<FacilityCategory> categories, int radius) {
+
+        Point coordinate = accommodation.getAddress().getCoordinate().getCoordinate();
+
         List<FacilityResponse> responses = fetchNearbyFacilities(
                 categories,
-                accommodation.getAddress().getLongitude(),
-                accommodation.getAddress().getLatitude(),
+                coordinate.getX(),
+                coordinate.getY(),
                 radius)
                 .collectList()
                 .block();
