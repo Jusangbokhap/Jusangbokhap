@@ -42,5 +42,4 @@ public class Facility extends BaseEntity {
         this.facilityCount = facilityCount;
         this.setUpdatedAt(LocalDateTime.now());
     }
-
 }

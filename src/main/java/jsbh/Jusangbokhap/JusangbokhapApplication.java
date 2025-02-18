@@ -13,5 +13,4 @@ public class JusangbokhapApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(JusangbokhapApplication.class, args);
 	}
-
 }
