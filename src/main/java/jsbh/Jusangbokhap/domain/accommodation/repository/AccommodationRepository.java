@@ -8,6 +8,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.persistence.Query;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.availableDate.AvailableDateStatus;
 import org.locationtech.jts.geom.Point;
@@ -53,13 +55,30 @@ public class AccommodationRepository {
                 .fetch();
     }
 
-    public List<Accommodation> findAccommodationByCoordinate(Double longitude, Double latitude, Double radius) {
-        return em.createNativeQuery("SELECT a.* FROM accommodation a " +
-                        "JOIN accommodation_address ad ON a.accommodation_address_id = ad.accommodation_address_id " +
-                "WHERE ST_DWithin(ad.coordinate, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326), :radius)", Accommodation.class)
+    public List<Accommodation> findAccommodationByCoordinate(Double longitude, Double latitude, Double radius,
+                                                             Long lastAccommodationId, int pageSize) {
+
+        String query = "SELECT a.* FROM accommodation a" +
+                " JOIN accommodation_address ad ON a.accommodation_address_id = ad.accommodation_address_id" +
+                " WHERE ST_DWithin(ad.coordinate, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326), :radius, true)";
+
+        // 처음 조회하는 게 아니라면
+        if (lastAccommodationId != null) {
+            query += " AND a.accommodation_id > :lastAccommodationId";
+        }
+
+        query += " ORDER BY a.accommodation_id LIMIT :pageSize";
+
+        Query nativeQuery = em.createNativeQuery(query, Accommodation.class)
                 .setParameter("longitude", longitude)
                 .setParameter("latitude", latitude)
                 .setParameter("radius", radius)
-                .getResultList();
+                .setParameter("pageSize", pageSize);
+
+        if (lastAccommodationId != null) {
+            nativeQuery.setParameter("lastAccommodationId", lastAccommodationId);
+        }
+
+        return nativeQuery.getResultList();
     }
 }

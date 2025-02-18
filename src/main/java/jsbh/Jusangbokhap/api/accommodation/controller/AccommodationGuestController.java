@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationCoordSearchRequest;
+import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationCoordSearchResponse;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
 import jsbh.Jusangbokhap.api.accommodation.service.AccommodationGuestService;
@@ -39,7 +40,7 @@ public class AccommodationGuestController {
     }
 
     @GetMapping("/coordinate")
-    public List<AccommodationResponse> search(@RequestBody AccommodationCoordSearchRequest coordSearchRequest) {
+    public List<AccommodationCoordSearchResponse> search(AccommodationCoordSearchRequest coordSearchRequest) {
         return accommodationGuestService.findByCoordinate(coordSearchRequest);
     }
 
