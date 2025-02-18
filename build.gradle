@@ -18,6 +18,7 @@ jacocoTestReport {
 		xml.required = true
 		html.required = true
 	}
+	dependsOn test
 }
 
 test {
@@ -56,6 +57,23 @@ repositories {
 
 ext {
 	querydslVersion = '5.0.0'
+	set('springDocVersion',"2.8.3")
+}
+
+allprojects {
+	tasks.withType(Test) {
+		maxParallelForks = (Runtime.runtime.availableProcessors() / 2).intValue() ?: 1
+		forkEvery = 100
+		reports.html.required = false
+	}
+}
+
+gradle.projectsEvaluated {
+	tasks.withType(JavaCompile) {
+		options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+		options.fork = true
+		options.forkOptions.jvmArgs += ['-Xmx2048m']
+	}
 }
 
 dependencies {
@@ -100,12 +118,29 @@ dependencies {
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
+	maxParallelForks = (Runtime.runtime.availableProcessors() / 2).intValue() ?: 1
+	jvmArgs = ['-Xmx2g', '-XX:MaxMetaspaceSize=512m']
+	outputs.upToDateWhen { true }
+
+	finalizedBy jacocoTestReport
+	jacoco {
+		destinationFile = file("${buildDir}/jacoco/test.exec")
+	}
+
+	reports {
+		html.required = false
+		junitXml.required = true
+	}
+
+	forkEvery = 100
 }
 
 tasks.withType(JavaCompile).configureEach {
 	options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
+	options.fork = true
+	options.incremental = true
 }
 
 // ✅ QueryDSL이 자동으로 빌드될 수 있도록 설정
