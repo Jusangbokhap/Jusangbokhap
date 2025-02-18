@@ -18,5 +18,4 @@ public class SearchKeywordController {
     public List<SearchKeywordRankResponse> searchKeywordRank() {
         return keywordRedisService.getTopKeywordFromRedis();
     }
-
 }

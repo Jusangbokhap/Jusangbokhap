@@ -25,5 +25,4 @@ public class SearchKeywordRankResponse {
                 .count(count)
                 .build();
     }
-
 }

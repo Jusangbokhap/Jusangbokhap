@@ -16,5 +16,4 @@ public class SearchKeywordRequest {
     public SearchKeywordRequest(String keyword) {
         this.keyword = keyword;
     }
-
 }

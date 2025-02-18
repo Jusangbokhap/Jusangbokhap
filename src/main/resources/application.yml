@@ -13,12 +13,11 @@ logging:
 
 kakao:
   api:
-    admin-key: ""
     cid: "TC0ONETIME"
     approval-url: "https://frontend.com/payments/approve"
     cancel-url: "https://frontend.com/payments/cancel"
     fail-url: "https://frontend.com/payments/fail"
-    key: ${KAKAO_API_KEY}
+    key: DEVC6AFF24FBF9E47EFC2005FC407B728DA9B3D3
 
 elasticsearch:
   custom:
@@ -123,22 +122,22 @@ spring:
   config:
     activate:
       on-profile: prod
-  datasource:
-    url: jdbc:postgresql://${POSTGRES_URL}:5432/${POSTGRES_DB}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 5
-      minimum-idle: 1
-      idle-timeout: 300000
+    datasource:
+      url: jdbc:postgresql://172.17.0.2:5432/jusangbokhap
+      username: jusangbokhap
+      password: jusangbokhap
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 5
+        minimum-idle: 1
+        idle-timeout: 300000
   data:
     mongodb:
-      uri: mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0.5ly7k.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority&appName=Cluster0
+      uri: mongodb+srv://jusangbokhap:jusangbokhap@cluster0.5ly7k.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority&appName=Cluster0
     redis:
       host: redis
       port: 6379
-      password: ${REDIS_PASSWORD}
+      password: jusangbokhap
       lettuce:
         pool:
           max-active: 8

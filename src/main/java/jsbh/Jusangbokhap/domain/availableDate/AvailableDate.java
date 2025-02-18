@@ -46,7 +46,6 @@ public class AvailableDate {
 
     @Version
     private Long version;
-  
     protected void setAccommodation(Accommodation accommodation) {
         this.accommodation = accommodation;
     }

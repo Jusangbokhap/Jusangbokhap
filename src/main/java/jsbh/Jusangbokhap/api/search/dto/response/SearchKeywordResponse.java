@@ -11,9 +11,7 @@ import java.time.LocalDateTime;
 public class SearchKeywordResponse {
 
     private String id; // 후에 삭제할 수 있음
-    
     private String keyword;
-    
     private LocalDateTime timestamp;
 
     public static SearchKeywordResponse of(String id, KeywordDocument keywordDocument) {
