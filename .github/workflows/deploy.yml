@@ -114,6 +114,8 @@ jobs:
         run: |
           kubectl get secret elasticsearch-cert -n elasticsearch --ignore-not-found -o yaml | \
           sed 's/namespace: elasticsearch/namespace: default/' | \
+          sed 's/resourceVersion: ".*"/resourceVersion: ""/' | \
+          sed 's/uid: .*$/uid: ""/' | \
           kubectl apply -f -
           
           helm upgrade --install jusangbokhap ./helm-chart --namespace default --set image.repository=$ECR_REGISTRY/$ECR_REPOSITORY --set image.tag=$IMAGE_TAG
