@@ -51,7 +51,7 @@ jobs:
             --from-literal=password='${{ secrets.ES_PASSWORD }}' \
             --from-literal=host='${{ secrets.ELASTICSEARCH_HOST }}' \
             --from-literal=port='${{ secrets.ELASTICSEARCH_PORT }}' \
-            --namespace elasticsearch \
+            --namespace default \
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Deploy Elasticsearch
