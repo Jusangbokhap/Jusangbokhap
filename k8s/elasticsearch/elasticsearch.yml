@@ -4,6 +4,13 @@ metadata:
   name: jusangbokhap-es
 spec:
   version: 8.11.1
+  http:
+    tls:
+      selfSignedCertificate:
+        subjectAltNames:
+          - dns: "jusangbokhap-es-es-http.elasticsearch"
+          - dns: "jusangbokhap-es-es-http.elasticsearch.svc"
+          - dns: "jusangbokhap-es-es-http.elasticsearch.svc.cluster.local"
   nodeSets:
   - name: default
     count: 1
