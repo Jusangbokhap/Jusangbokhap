@@ -38,7 +38,7 @@ public class AccommodationGuestController {
         return accommodationGuestService.find(search);
     }
 
-    @GetMapping("/coordinate")
+    @PostMapping("/coordinate")
     public List<AccommodationResponse> search(@RequestBody AccommodationCoordSearchRequest coordSearchRequest) {
         return accommodationGuestService.findByCoordinate(coordSearchRequest);
     }
