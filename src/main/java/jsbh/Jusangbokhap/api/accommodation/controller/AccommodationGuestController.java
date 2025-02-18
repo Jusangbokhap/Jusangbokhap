@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import java.io.IOException;
 import java.util.List;
+
+import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationCoordSearchRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
 import jsbh.Jusangbokhap.api.accommodation.service.AccommodationGuestService;
@@ -12,10 +14,7 @@ import jsbh.Jusangbokhap.api.search.service.SearchKeywordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -37,6 +36,11 @@ public class AccommodationGuestController {
     public List<AccommodationResponse> search(@ParameterObject @ModelAttribute AccommodationRequest.Search search) throws IOException {
         keywordService.saveKeyword(search);
         return accommodationGuestService.find(search);
+    }
+
+    @GetMapping("/coordinate")
+    public List<AccommodationResponse> search(@RequestBody AccommodationCoordSearchRequest coordSearchRequest) {
+        return accommodationGuestService.findByCoordinate(coordSearchRequest);
     }
 
 }

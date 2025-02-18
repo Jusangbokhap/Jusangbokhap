@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.availableDate.AvailableDateStatus;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -50,5 +51,15 @@ public class AccommodationRepository {
                 .distinct()
                 .where(availableDate.status.eq(AvailableDateStatus.AVAILABLE), predicate)
                 .fetch();
+    }
+
+    public List<Accommodation> findAccommodationByCoordinate(Double longitude, Double latitude, Double radius) {
+        return em.createNativeQuery("SELECT a.* FROM accommodation a " +
+                        "JOIN accommodation_address ad ON a.accommodation_address_id = ad.accommodation_address_id " +
+                "WHERE ST_DWithin(ad.coordinate, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326), :radius)", Accommodation.class)
+                .setParameter("longitude", longitude)
+                .setParameter("latitude", latitude)
+                .setParameter("radius", radius)
+                .getResultList();
     }
 }

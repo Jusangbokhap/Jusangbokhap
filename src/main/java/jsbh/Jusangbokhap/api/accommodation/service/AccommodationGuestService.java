@@ -4,13 +4,17 @@ package jsbh.Jusangbokhap.api.accommodation.service;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import jakarta.transaction.Transactional;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+
+import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationCoordSearchRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse.Search;
+import jsbh.Jusangbokhap.api.accommodation.mapper.AccommodationMapper;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.accommodation.AccommodationType;
 import jsbh.Jusangbokhap.domain.accommodation.QAccommodation;
@@ -45,6 +49,23 @@ public class AccommodationGuestService {
         }
         return responses;
     }
+
+    public List<AccommodationResponse> findByCoordinate(AccommodationCoordSearchRequest coordSearchRequest) {
+
+        List<Accommodation> accommodations =
+                accommodationRepository.findAccommodationByCoordinate(coordSearchRequest.getLongitude(),
+                        coordSearchRequest.getLatitude(),
+                        coordSearchRequest.getRadius());
+
+        List<AccommodationResponse> responses = new ArrayList<>();
+
+        for (Accommodation accommodation : accommodations) {
+            responses.add(AccommodationMapper.toResponse(accommodation));
+        }
+
+        return responses;
+    }
+
 
     private Predicate buildPredicate(AccommodationRequest.Search filter) {
         BooleanBuilder builder = new BooleanBuilder();
