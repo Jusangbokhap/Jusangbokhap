@@ -5,6 +5,7 @@ on:
     branches:
       - "main"
       - "dev"
+      - "CICD"
     paths-ignore:
       - '.github/workflows/**'
       - '**.md'
