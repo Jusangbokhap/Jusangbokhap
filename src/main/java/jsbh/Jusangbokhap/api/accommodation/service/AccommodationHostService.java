@@ -14,6 +14,7 @@ import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.accommodation.repository.AccommodationRepository;
 import jsbh.Jusangbokhap.domain.availableDate.AvailableDate;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -90,7 +91,8 @@ public class AccommodationHostService {
 
     public AccommodationResponse.Address getAccommodationAddressById(Long accommodationId) {
         Accommodation accommodation = getAccommodationByAccommodationId(accommodationId);
-        return new Address(accommodation.getAddress().getLatitude(), accommodation.getAddress().getLatitude());
+        Point coordinate = accommodation.getAddress().getCoordinate().getCoordinate();
+        return new Address(coordinate.getX(), coordinate.getY());
     }
 
     //TODO 분리 예정

@@ -7,15 +7,15 @@ import java.util.stream.Collectors;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest.Create;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse.Read;
 import jsbh.Jusangbokhap.api.availableDate.mapper.AvailableDateMapper;
-import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
-import jsbh.Jusangbokhap.domain.accommodation.AccommodationAddress;
-import jsbh.Jusangbokhap.domain.accommodation.AccommodationPrice;
-import jsbh.Jusangbokhap.domain.accommodation.AccommodationType;
-import jsbh.Jusangbokhap.domain.accommodation.AccommodationCapacity;
+import jsbh.Jusangbokhap.domain.accommodation.*;
+import org.locationtech.jts.geom.Point;
 
 public class AccommodationMapper {
 
     public static Accommodation toEntity(Create request) {
+
+        Point coordinate = AccommodationCoordinate
+                .createCoordinate(request.longitude(), request.latitude());
 
         return Accommodation.builder()
 
@@ -28,8 +28,7 @@ public class AccommodationMapper {
                         .sigungu(request.sigungu())
                         .eupmyeondong(request.eupmyeondong())
                         .detail(request.detail())
-                        .longitude(request.longitude())
-                        .latitude(request.latitude())
+                        .coordinate(new AccommodationCoordinate(coordinate))
                         .build())
 
                 .accommodationPrice(AccommodationPrice.from(request.price()))
@@ -55,8 +54,8 @@ public class AccommodationMapper {
                 accommodation.getBusinessName(),
                 accommodation.getTitle(),
                 accommodation.getAddress().getFullAddress(),
-                accommodation.getAddress().getLongitude(),
-                accommodation.getAddress().getLatitude(),
+                accommodation.getAddress().getCoordinate().getCoordinate().getX(),
+                accommodation.getAddress().getCoordinate().getCoordinate().getY(),
                 accommodation.getDescription(),
                 accommodation.getAccommodationPrice().getPrice(),
                 accommodation.getAccommodationType().name(),

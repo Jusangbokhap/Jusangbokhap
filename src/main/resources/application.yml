@@ -75,12 +75,13 @@ server:
 ---
 spring:
   config:
+    import: optional:file:.env[.properties]
     activate:
       on-profile: dev
   datasource:
     url: jdbc:postgresql://localhost:5432/jusangbokhap
     username: postgres
-    password: postgres
+    password: 1234
     driver-class-name: org.postgresql.Driver
   data:
     mongodb:
@@ -94,6 +95,19 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+
+elasticsearch:
+  custom:
+    host: ${ELASTICSEARCH_LOCAL_HOST}
+    port: ${ELASTICSEARCH_LOCAL_PORT}
+    username: ${ELASTICSEARCH_LOCAL_USERNAME}
+    password: ${ELASTICSEARCH_LOCAL_PASSWORD}
+    certificate: ${ELASTICSEARCH_LOCAL_CERTIFICATE}
 
 ---
 spring:
@@ -116,7 +130,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
-    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
 
 ---
 spring:
@@ -158,7 +176,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
 
 management:
   endpoint:

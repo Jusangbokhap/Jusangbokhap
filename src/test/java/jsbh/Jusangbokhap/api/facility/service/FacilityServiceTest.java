@@ -11,6 +11,7 @@ import java.util.Map;
 import jsbh.Jusangbokhap.api.accommodation.service.AccommodationHostService;
 import jsbh.Jusangbokhap.domain.accommodation.Accommodation;
 import jsbh.Jusangbokhap.domain.accommodation.AccommodationAddress;
+import jsbh.Jusangbokhap.domain.accommodation.AccommodationCoordinate;
 import jsbh.Jusangbokhap.domain.facility.FacilityCategory;
 import jsbh.Jusangbokhap.domain.facility.repository.FacilityRepository;
 import okhttp3.HttpUrl;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Point;
 import org.springframework.web.reactive.function.client.WebClient;
 
 class FacilityServiceTest {
@@ -54,10 +56,11 @@ class FacilityServiceTest {
     void 시설_업데이트_개수_조회_성공_테스트() {
         Long accommodationId = 1L;
 
+        Point coordinate = AccommodationCoordinate.createCoordinate(100.0, 200.0);
+
         Accommodation dummyAccommodation = Accommodation.builder()
                 .address(AccommodationAddress.builder()
-                        .longitude(100.0)
-                        .latitude(200.0)
+                        .coordinate(new AccommodationCoordinate(coordinate))
                         .build())
                 .build();
 

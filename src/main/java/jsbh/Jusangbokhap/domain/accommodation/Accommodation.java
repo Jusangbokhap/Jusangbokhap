@@ -49,7 +49,7 @@ public class Accommodation extends BaseEntity {
     private String businessName;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "accommodationAddress_id")
+    @JoinColumn(name = "accommodation_address_id")
     private AccommodationAddress address;
 
     @Column(nullable = false)

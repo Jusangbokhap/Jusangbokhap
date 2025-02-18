@@ -1,10 +1,6 @@
 package jsbh.Jusangbokhap.domain.accommodation;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +16,7 @@ public class AccommodationAddress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "accommodationAddress_id")
+    @Column(name = "accommodation_address_id")
     private Long id;
 
     private String sido;
@@ -31,9 +27,8 @@ public class AccommodationAddress {
 
     private String detail;
 
-    private Double longitude;
-
-    private Double latitude;
+    @Embedded
+    private AccommodationCoordinate coordinate;
 
     public String getFullAddress() {
         return sido + " " + sigungu + " " + eupmyeondong + " " + detail;
@@ -62,12 +57,8 @@ public class AccommodationAddress {
             this.detail = detail;
         }
 
-        if (longitude != null) {
-            this.longitude = longitude;
-        }
-
-        if (latitude != null) {
-            this.latitude = latitude;
+        if (longitude != null && latitude != null) {
+            this.coordinate.updateCoordinate(longitude,latitude);
         }
     }
 }
