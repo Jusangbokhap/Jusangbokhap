@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ "dev" ]
   push:
-    branches: [ "feat/**", "feature/**", "fix/**", "KR-123-chore/kr-123"]
+    branches: [ "feat/**", "feature/**", "fix/**", "CICD"]
     paths-ignore:
       - '.github/workflows/**'
   workflow_dispatch:
