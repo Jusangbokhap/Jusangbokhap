@@ -39,8 +39,16 @@ public class AccommodationGuestController {
         return accommodationGuestService.find(search);
     }
 
+    @Operation(
+        summary = "숙소 좌표로 검색 API",
+        description = "게스트는 지도에서 보이는 좌표로 숙소를 조회할 수 있다.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "숙소 검색 성공"),
+            @ApiResponse(responseCode = "400", description = "숙소 검색 실패")
+        }
+    )
     @GetMapping("/coordinate")
-    public List<AccommodationCoordSearchResponse> search(AccommodationCoordSearchRequest coordSearchRequest) {
+    public List<AccommodationCoordSearchResponse> search(@ModelAttribute AccommodationCoordSearchRequest coordSearchRequest) {
         return accommodationGuestService.findByCoordinate(coordSearchRequest);
     }
 
