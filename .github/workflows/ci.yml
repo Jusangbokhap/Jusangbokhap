@@ -7,6 +7,7 @@ on:
     branches: [ "feat/**", "feature/**", "fix/**", "KR-123-chore/kr-123"]
     paths-ignore:
       - '.github/workflows/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -42,15 +43,26 @@ jobs:
       - name: Cache Gradle packages
         uses: actions/cache@v3
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            build/
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build, test and analyze
-        run: ./gradlew build test jacocoTestReport --info
+        run: |
+          ./gradlew build test jacocoTestReport \
+          --parallel \
+          --build-cache \
+          --configure-on-demand \
+          --no-daemon \
+          -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=512m" \
+          --info
 
       - name: Upload test results
         if: always()
