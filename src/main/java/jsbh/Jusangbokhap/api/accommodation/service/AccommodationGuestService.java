@@ -3,7 +3,6 @@ package jsbh.Jusangbokhap.api.accommodation.service;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import jakarta.transaction.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationCoordSearchRequest;
+import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationCoordSearchResponse;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse.Search;
@@ -22,15 +22,16 @@ import jsbh.Jusangbokhap.domain.accommodation.repository.AccommodationRepository
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AccommodationGuestService {
 
     private final AccommodationRepository accommodationRepository;
 
-    @Transactional
     public List<AccommodationResponse> find(AccommodationRequest.Search filter) {
         Predicate predicate = buildPredicate(filter);
 
@@ -50,20 +51,18 @@ public class AccommodationGuestService {
         return responses;
     }
 
-    public List<AccommodationResponse> findByCoordinate(AccommodationCoordSearchRequest coordSearchRequest) {
+    public List<AccommodationCoordSearchResponse> findByCoordinate(AccommodationCoordSearchRequest coordSearchRequest) {
 
         List<Accommodation> accommodations =
                 accommodationRepository.findAccommodationByCoordinate(coordSearchRequest.getLongitude(),
                         coordSearchRequest.getLatitude(),
-                        coordSearchRequest.getRadius());
+                        coordSearchRequest.getRadius(),
+                        coordSearchRequest.getLastAccommodationId(),
+                        10);
 
-        List<AccommodationResponse> responses = new ArrayList<>();
-
-        for (Accommodation accommodation : accommodations) {
-            responses.add(AccommodationMapper.toResponse(accommodation));
-        }
-
-        return responses;
+        return accommodations.stream()
+                .map(AccommodationCoordSearchResponse::of)
+                .toList();
     }
 
 

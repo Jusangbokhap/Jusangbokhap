@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationCoordSearchRequest;
+import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationCoordSearchResponse;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationRequest;
 import jsbh.Jusangbokhap.api.accommodation.dto.AccommodationResponse;
 import jsbh.Jusangbokhap.api.accommodation.service.AccommodationGuestService;
@@ -38,8 +39,16 @@ public class AccommodationGuestController {
         return accommodationGuestService.find(search);
     }
 
-    @PostMapping("/coordinate")
-    public List<AccommodationResponse> search(@RequestBody AccommodationCoordSearchRequest coordSearchRequest) {
+    @Operation(
+        summary = "숙소 좌표로 검색 API",
+        description = "게스트는 지도에서 보이는 좌표로 숙소를 조회할 수 있다.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "숙소 검색 성공"),
+            @ApiResponse(responseCode = "400", description = "숙소 검색 실패")
+        }
+    )
+    @GetMapping("/coordinate")
+    public List<AccommodationCoordSearchResponse> search(@ModelAttribute AccommodationCoordSearchRequest coordSearchRequest) {
         return accommodationGuestService.findByCoordinate(coordSearchRequest);
     }
 
