@@ -139,6 +139,10 @@ jobs:
         with:
           version: v3.12.0
 
+      - name: Generate short SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Deploy to EKS
         run: |
           kubectl get secret elasticsearch-cert -n elasticsearch --ignore-not-found -o yaml | \
@@ -146,8 +150,6 @@ jobs:
           sed 's/resourceVersion: ".*"/resourceVersion: ""/' | \
           sed 's/uid: .*$/uid: ""/' | \
           kubectl apply -f -
-          
-          kubectl apply -f k8s/redis-deployment.yml
           
           sed -i "s|image:.*|image: ${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:${{ steps.vars.outputs.sha_short }}|" k8s/deployment.yml
           kubectl apply -f k8s/
